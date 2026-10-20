@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tigran Solomon's Paper Archive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Playfair+Display:ital,wght@0,400..800;1,400..800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0e0e11;
+      --panel: #16161c;
+      --panel-border: #282834;
+      --accent: #e5a93c;
+      --accent-hover: #f3be5c;
+      --text: #eae8e1;
+      --text-muted: #8c8a98;
+      --font-serif: 'Playfair Display', serif;
+      --font-mono: 'Space Mono', monospace;
+      --font-pixel: 'VT323', monospace;
+      --font-hand: 'Caveat', cursive;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 20%, rgba(229, 169, 60, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(180, 50, 30, 0.04) 0%, transparent 45%);
+    }
+
+    /* Header */
+    header {
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--panel-border);
+      background: rgba(14, 14, 17, 0.85);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand h1 {
+      font-family: var(--font-serif);
+      font-size: 1.6rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+
+    .brand span {
+      font-size: 0.72rem;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: #1c1c24;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--panel-border);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #34d399;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #34d399;
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 24px;
+      padding: 28px 32px;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    @media (max-width: 1024px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Control Panel */
+    .controls-panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      height: fit-content;
+    }
+
+    /* Mode Switcher */
+    .mode-switch-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .mode-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #111116;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--panel-border);
+      gap: 4px;
+    }
+
+    .mode-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px 14px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .mode-btn.active {
+      background: var(--panel-border);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    .mode-btn:hover:not(.active) {
+      color: var(--text);
+    }
+
+    /* Upload Zone */
+    .upload-zone {
+      border: 2px dashed #3a3a4c;
+      border-radius: 10px;
+      padding: 28px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: rgba(0, 0, 0, 0.15);
+      position: relative;
+    }
+
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(229, 169, 60, 0.05);
+    }
+
+    .upload-zone input {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .upload-icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    .upload-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .upload-sub {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .sample-loader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--panel-border);
+    }
+
+    .sample-loader span {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .sample-btn {
+      background: none;
+      border: 1px solid var(--panel-border);
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .sample-btn:hover {
+      background: rgba(229, 169, 60, 0.1);
+      border-color: var(--accent);
+    }
+
+    /* Form Inputs */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-muted);
+    }
+
+    .form-input, .form-textarea, .form-select {
+      background: #111116;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--accent);
+    }
+
+    .form-textarea {
+      min-height: 85px;
+      resize: vertical;
+      line-height: 1.4;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+    }
+
+    .toggle-row span {
+      font-size: 0.8rem;
+      color: var(--text);
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 22px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #2b2b38;
+      transition: .3s;
+      border-radius: 22px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--accent);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(18px);
+    }
+
+    /* Action Buttons */
+    .btn-primary {
+      background: var(--accent);
+      color: #0e0e11;
+      border: none;
+      border-radius: 8px;
+      padding: 13px 20px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    /* Preview Workspace */
+    .workspace {
+      display: flex;
+      flex-direction: column;
+      background: #121217;
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      overflow: hidden;
+      min-height: 600px;
+    }
+
+    .workspace-header {
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--panel-border);
+      background: #181820;
+    }
+
+    .workspace-title {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-download {
+      background: #252533;
+      color: #fff;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      padding: 7px 16px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-download:hover {
+      background: var(--accent);
+      color: #0e0e11;
+      border-color: var(--accent);
+    }
+
+    .preview-canvas-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      background-image: 
+        radial-gradient(#252535 1px, transparent 1px),
+        radial-gradient(#252535 1px, #121217 1px);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+      overflow: auto;
+      position: relative;
+    }
+
+    #renderCanvas {
+      max-width: 100%;
+      height: auto;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+      border-radius: 2px;
+      transition: transform 0.2s ease;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--text-muted);
+      max-width: 380px;
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+      opacity: 0.6;
+    }
+
+    .empty-state h3 {
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .empty-state p {
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    /* Footer */
+    footer {
+      padding: 16px 32px;
+      border-top: 1px solid var(--panel-border);
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <h1>Tigran Solomon's Paper Archive</h1>
+      <span>Analog Visual Stylization Studio</span>
+    </div>
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      <span>SYSTEM READY // CLIENT ENGINE</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- Controls Sidebar -->
+    <div class="controls-panel">
+      <div>
+        <div class="mode-switch-title">Режим стилизации</div>
+        <div class="mode-switch">
+          <button class="mode-btn active" id="btnModeA" onclick="switchMode('A')">
+            <span>🧾</span> Mode A: Receipt
+          </button>
+          <button class="mode-btn" id="btnModeB" onclick="switchMode('B')">
+            <span>📷</span> Mode B: Polaroid
+          </button>
+        </div>
+      </div>
+
+      <!-- Upload Zone -->
+      <div class="upload-zone" id="dropZone">
+        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp">
+        <div class="upload-icon">🎞️</div>
+        <div class="upload-label">Загрузите или перетащите фото</div>
+        <div class="upload-sub">Поддерживаются JPG, PNG, WEBP</div>
+        <div class="sample-loader">
+          <span>Нет под рукой фото?</span>
+          <button type="button" class="sample-btn" onclick="loadSampleImage(event)">Загрузить демо</button>
+        </div>
+      </div>
+
+      <!-- Controls for Mode A (Receipt) -->
+      <div id="controlsModeA" class="mode-controls">
+        <div class="form-group">
+          <label>Заголовок архива</label>
+          <input type="text" id="receiptTitle" class="form-input" value="TIGRAN SOLOMON'S PAPER ARCHIVE">
+        </div>
+
+        <div class="form-group" style="margin-top: 12px;">
+          <label>Позиции чека (каждая с новой строки)</label>
+          <textarea id="receiptItems" class="form-textarea" placeholder="01 SILVER HALIDE GRAIN&#10;01 THERMAL EMULSION 58MM&#10;01 ANALOG LATENT PRINT">SILVER HALIDE GELATIN
+THERMAL EMULSION 58MM
+1-BIT DIFFUSION MATRIX
+ANALOG MEMORY CAPTURE
+LATENT RETRIEVAL PASS</textarea>
+        </div>
+
+        <div class="form-row" style="margin-top: 12px;">
+          <div class="form-group">
+            <label>Ширина ленты</label>
+            <select id="receiptWidth" class="form-select">
+              <option value="580" selected>580px (58mm)</option>
+              <option value="800">800px (80mm)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Дизеринг</label>
+            <select id="ditherAlgo" class="form-select">
+              <option value="floyd" selected>Floyd-Steinberg</option>
+              <option value="atkinson">Atkinson</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 12px;">
+          <label>Дата / Время (пусто = текущее)</label>
+          <input type="text" id="receiptDate" class="form-input" placeholder="1998-04-18 21:40:00">
+        </div>
+
+        <div class="toggle-row" style="margin-top: 12px;">
+          <span>Зубчатые края (перфорация)</span>
+          <label class="switch">
+            <input type="checkbox" id="receiptTornEdge" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Controls for Mode B (Polaroid) -->
+      <div id="controlsModeB" class="mode-controls" style="display: none;">
+        <div class="form-group">
+          <label>Подпись на рамке</label>
+          <input type="text" id="polaroidCaption" class="form-input" value="Tigran Solomon's Paper Archive">
+        </div>
+
+        <div class="form-row" style="margin-top: 12px;">
+          <div class="form-group">
+            <label>LCD Дата (90s Quartz Back)</label>
+            <input type="text" id="polaroidDate" class="form-input" placeholder="1998-04-18 (или '98 04 18)">
+          </div>
+          <div class="form-group">
+            <label>Формат кадра</label>
+            <select id="polaroidAspect" class="form-select">
+              <option value="1:1" selected>1:1 (Квадрат)</option>
+              <option value="4:5">4:5 (Классика)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="toggle-row" style="margin-top: 12px;">
+          <span>Случайная засветка (Light Leak)</span>
+          <label class="switch">
+            <input type="checkbox" id="polaroidLightLeak" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <span>Виньетирование</span>
+          <label class="switch">
+            <input type="checkbox" id="polaroidVignette" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <button type="button" class="btn-primary" onclick="generateArchive()">
+        <span>⚡</span> Сгенерировать архив
+      </button>
+    </div>
+
+    <!-- Preview Canvas Workspace -->
+    <div class="workspace">
+      <div class="workspace-header">
+        <div class="workspace-title">
+          <span>🎞️</span>
+          <span id="workspaceTitleText">Предпросмотр: Mode A (Receipt Archive)</span>
+        </div>
+        <button type="button" class="btn-download" id="btnDownload" onclick="downloadArchive()" disabled>
+          <span>📥</span> Скачать PNG
+        </button>
+      </div>
+
+      <div class="preview-canvas-container" id="canvasContainer">
+        <canvas id="renderCanvas" style="display: none;"></canvas>
+        <div class="empty-state" id="emptyState">
+          <div class="empty-state-icon">📸</div>
+          <h3>Ожидание изображения</h3>
+          <p>Загрузите фото слева или нажмите «Загрузить демо», чтобы мгновенно стилизовать снимок под архивный формат.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    TIGRAN SOLOMON'S PAPER ARCHIVE // ANALOG VISUAL RETRIEVAL // MODE A &amp; MODE B ENGINE
+  </footer>
+
+  <!-- Bundled Minimal QR Code Engine for Instant Zero-Dependency QR Rendering -->
+  <script>
+    // Lightweight QR code generator (Type 1-4 Byte Mode)
+    var QRCodeLib = (function () {
+      function QR8bitByte(data) {
+        this.mode = 4;
+        this.data = data;
+      }
+      QR8bitByte.prototype = {
+        getLength: function () { return this.data.length; },
+        write: function (buffer) {
+          for (var i = 0; i < this.data.length; i++) buffer.put(this.data.charCodeAt(i), 8);
+        }
+      };
+
+      function QRBitBuffer() {
+        this.buffer = [];
+        this.length = 0;
+      }
+      QRBitBuffer.prototype = {
+        get: function (index) { return ((this.buffer[Math.floor(index / 8)] >>> (7 - index % 8)) & 1) == 1; },
+        put: function (num, length) {
+          for (var i = 0; i < length; i++) this.putBit(((num >>> (length - i - 1)) & 1) == 1);
+        },
+        putBit: function (bit) {
+          if (this.length == this.buffer.length * 8) this.buffer.push(0);
+          if (bit) this.buffer[Math.floor(this.length / 8)] |= (0x80 >>> (this.length % 8));
+          this.length++;
+        }
+      };
+
+      var QRPolynomial = function (num, shift) {
+        var offset = 0;
+        while (offset < num.length && num[offset] == 0) offset++;
+        this.num = new Array(num.length - offset + shift);
+        for (var i = 0; i < num.length - offset; i++) this.num[i] = num[i + offset];
+      };
+      var QRMath = {
+        glog: function (n) { return QRMath.LOG_TABLE[n]; },
+        gexp: function (n) {
+          while (n < 0) n += 255;
+          while (n >= 256) n -= 255;
+          return QRMath.EXP_TABLE[n];
+        },
+        EXP_TABLE: new Array(256),
+        LOG_TABLE: new Array(256)
+      };
+      for (var i = 0; i < 8; i++) QRMath.EXP_TABLE[i] = 1 << i;
+      for (var i = 8; i < 256; i++) QRMath.EXP_TABLE[i] = QRMath.EXP_TABLE[i - 4] ^ QRMath.EXP_TABLE[i - 5] ^ QRMath.EXP_TABLE[i - 6] ^ QRMath.EXP_TABLE[i - 8];
+      for (var i = 0; i < 255; i++) QRMath.LOG_TABLE[QRMath.EXP_TABLE[i]] = i;
+
+      QRPolynomial.prototype = {
+        get: function (index) { return this.num[index]; },
+        getLength: function () { return this.num.length; },
+        multiply: function (e) {
+          var num = new Array(this.getLength() + e.getLength() - 1);
+          for (var i = 0; i < this.getLength(); i++) {
+            for (var j = 0; j < e.getLength(); j++) {
+              num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i)) + QRMath.glog(e.get(j)));
+            }
+          }
+          return new QRPolynomial(num, 0);
+        },
+        mod: function (e) {
+          if (this.getLength() - e.getLength() < 0) return this;
+          var ratio = QRMath.glog(this.get(0)) - QRMath.glog(e.get(0));
+          var num = new Array(this.getLength());
+          for (var i = 0; i < this.getLength(); i++) num[i] = this.get(i);
+          for (var i = 0; i < e.getLength(); i++) num[i] ^= QRMath.gexp(QRMath.glog(e.get(i)) + ratio);
+          return new QRPolynomial(num, 0).mod(e);
+        }
+      };
+
+      function QRCodeModel(typeNumber, errorCorrectLevel) {
+        this.typeNumber = typeNumber;
+        this.errorCorrectLevel = errorCorrectLevel;
+        this.modules = null;
+        this.moduleCount = 0;
+        this.dataList = [];
+      }
+      QRCodeModel.prototype = {
+        addData: function (data) { this.dataList.push(new QR8bitByte(data)); },
+        isDark: function (row, col) { return this.modules[row][col]; },
+        getModuleCount: function () { return this.moduleCount; },
+        make: function () {
+          this.moduleCount = this.typeNumber * 4 + 17;
+          this.modules = new Array(this.moduleCount);
+          for (var row = 0; row < this.moduleCount; row++) {
+            this.modules[row] = new Array(this.moduleCount);
+            for (var col = 0; col < this.moduleCount; col++) this.modules[row][col] = null;
+          }
+          this.setupPositionProbePattern(0, 0);
+          this.setupPositionProbePattern(this.moduleCount - 7, 0);
+          this.setupPositionProbePattern(0, this.moduleCount - 7);
+          this.setupTimingPattern();
+          this.mapData(this.createData(), 0);
+        },
+        setupPositionProbePattern: function (row, col) {
+          for (var r = -1; r <= 7; r++) {
+            if (row + r <= -1 || this.moduleCount <= row + r) continue;
+            for (var c = -1; c <= 7; c++) {
+              if (col + c <= -1 || this.moduleCount <= col + c) continue;
+              if ((0 <= r && r <= 6 && (c == 0 || c == 6)) || (0 <= c && c <= 6 && (r == 0 || r == 6)) || (2 <= r && r <= 4 && 2 <= c && c <= 4)) {
+                this.modules[row + r][col + c] = true;
+              } else {
+                this.modules[row + r][col + c] = false;
+              }
+            }
+          }
+        },
+        setupTimingPattern: function () {
+          for (var r = 8; r < this.moduleCount - 8; r++) {
+            if (this.modules[r][6] === null) this.modules[r][6] = (r % 2 == 0);
+          }
+          for (var c = 8; c < this.moduleCount - 8; c++) {
+            if (this.modules[6][c] === null) this.modules[6][c] = (c % 2 == 0);
+          }
+        },
+        createData: function () {
+          var buffer = new QRBitBuffer();
+          for (var i = 0; i < this.dataList.length; i++) {
+            var data = this.dataList[i];
+            buffer.put(data.mode, 4);
+            buffer.put(data.getLength(), 8);
+            data.write(buffer);
+          }
+          buffer.put(0, 4); // terminator
+          while (buffer.length % 8 != 0) buffer.putBit(false);
+          var maxData = (this.typeNumber <= 2) ? 32 : 55;
+          while (buffer.buffer.length < maxData) {
+            buffer.put(0xEC, 8);
+            if (buffer.buffer.length < maxData) buffer.put(0x11, 8);
+          }
+          return buffer.buffer;
+        },
+        mapData: function (data, mask) {
+          var inc = -1, row = this.moduleCount - 1, bitIndex = 0, byteIndex = 0;
+          for (var col = this.moduleCount - 1; col > 0; col -= 2) {
+            if (col == 6) col--;
+            while (true) {
+              for (var c = 0; c < 2; c++) {
+                if (this.modules[row][col - c] === null) {
+                  var dark = false;
+                  if (byteIndex < data.length) {
+                    dark = (((data[byteIndex] >>> (7 - bitIndex)) & 1) == 1);
+                  }
+                  this.modules[row][col - c] = dark;
+                  bitIndex++;
+                  if (bitIndex == 8) { bitIndex = 0; byteIndex++; }
+                }
+              }
+              row += inc;
+              if (row < 0 || this.moduleCount <= row) { row -= inc; inc = -inc; break; }
+            }
+          }
+        }
+      };
+
+      return {
+        generateMatrix: function (text) {
+          var type = text.length > 30 ? 4 : 2;
+          var qr = new QRCodeModel(type, 1);
+          qr.addData(text);
+          qr.make();
+          return qr;
+        }
+      };
+    })();
+  </script>
+
+  <!-- Application Logic -->
+  <script>
+    var currentMode = 'A';
+    var loadedImage = null;
+
+    function switchMode(mode) {
+      currentMode = mode;
+      document.getElementById('btnModeA').classList.toggle('active', mode === 'A');
+      document.getElementById('btnModeB').classList.toggle('active', mode === 'B');
+      document.getElementById('controlsModeA').style.display = (mode === 'A') ? 'block' : 'none';
+      document.getElementById('controlsModeB').style.display = (mode === 'B') ? 'block' : 'none';
+      document.getElementById('workspaceTitleText').textContent = 
+        mode === 'A' ? 'Предпросмотр: Mode A (Receipt Archive)' : 'Предпросмотр: Mode B (Polaroid Snap)';
+      
+      if (loadedImage) {
+        generateArchive();
+      }
+    }
+
+    // File Upload Handling
+    var dropZone = document.getElementById('dropZone');
+    var fileInput = document.getElementById('fileInput');
+
+    fileInput.addEventListener('change', function(e) {
+      if (e.target.files && e.target.files[0]) {
+        handleFile(e.target.files[0]);
+      }
+    });
+
+    dropZone.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', function() {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    function handleFile(file) {
+      var reader = new FileReader();
+      reader.onload = function(evt) {
+        var img = new Image();
+        img.onload = function() {
+          loadedImage = img;
+          generateArchive();
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Built-in Demo Graphic Generator
+    function loadSampleImage(event) {
+      if (event) event.stopPropagation();
+      var demoCanvas = document.createElement('canvas');
+      demoCanvas.width = 600;
+      demoCanvas.height = 600;
+      var ctx = demoCanvas.getContext('2d');
+
+      // Draw artistic portrait silhouette
+      var grad = ctx.createLinearGradient(0, 0, 600, 600);
+      grad.addColorStop(0, '#e5a93c');
+      grad.addColorStop(0.5, '#b4321e');
+      grad.addColorStop(1, '#1b1b24');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 600, 600);
+
+      // Circles & geometry
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.beginPath();
+      ctx.arc(300, 260, 140, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#16161c';
+      ctx.beginPath();
+      ctx.arc(300, 240, 90, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.beginPath();
+      ctx.ellipse(300, 480, 180, 120, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      var img = new Image();
+      img.onload = function() {
+        loadedImage = img;
+        generateArchive();
+      };
+      img.src = demoCanvas.toDataURL();
+    }
+
+    // 1-Bit Dithering Functions
+    function floydSteinbergDither(imageData) {
+      var w = imageData.width;
+      var h = imageData.height;
+      var d = imageData.data;
+      var gray = new Float32Array(w * h);
+
+      // Pre-convert to grayscale with contrast stretch
+      var minVal = 255, maxVal = 0;
+      for (var i = 0; i < w * h; i++) {
+        var val = 0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2];
+        gray[i] = val;
+        if (val < minVal) minVal = val;
+        if (val > maxVal) maxVal = val;
+      }
+
+      // Histogram stretch
+      var range = (maxVal - minVal) || 1;
+      for (var i = 0; i < w * h; i++) {
+        gray[i] = Math.min(255, Math.max(0, ((gray[i] - minVal) / range) * 255));
+      }
+
+      // Diffusion
+      for (var y = 0; y < h; y++) {
+        for (var x = 0; x < w; x++) {
+          var idx = y * w + x;
+          var oldPixel = gray[idx];
+          var newPixel = oldPixel >= 128 ? 255 : 0;
+          gray[idx] = newPixel;
+          var err = oldPixel - newPixel;
+
+          if (x + 1 < w) gray[idx + 1] += err * (7 / 16);
+          if (y + 1 < h) {
+            if (x - 1 >= 0) gray[(y + 1) * w + (x - 1)] += err * (3 / 16);
+            gray[(y + 1) * w + x] += err * (5 / 16);
+            if (x + 1 < w) gray[(y + 1) * w + (x + 1)] += err * (1 / 16);
+          }
+        }
+      }
+
+      // Put back to imageData
+      for (var i = 0; i < w * h; i++) {
+        var v = gray[i] >= 128 ? 255 : 0;
+        d[i * 4] = v;
+        d[i * 4 + 1] = v;
+        d[i * 4 + 2] = v;
+        d[i * 4 + 3] = 255;
+      }
+    }
+
+    function atkinsonDither(imageData) {
+      var w = imageData.width;
+      var h = imageData.height;
+      var d = imageData.data;
+      var gray = new Float32Array(w * h);
+
+      for (var i = 0; i < w * h; i++) {
+        gray[i] = 0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2];
+      }
+
+      for (var y = 0; y < h; y++) {
+        for (var x = 0; x < w; x++) {
+          var idx = y * w + x;
+          var oldPixel = gray[idx];
+          var newPixel = oldPixel >= 128 ? 255 : 0;
+          gray[idx] = newPixel;
+          var err = (oldPixel - newPixel) / 8;
+
+          if (x + 1 < w) gray[idx + 1] += err;
+          if (x + 2 < w) gray[idx + 2] += err;
+          if (y + 1 < h) {
+            if (x - 1 >= 0) gray[(y + 1) * w + (x - 1)] += err;
+            gray[(y + 1) * w + x] += err;
+            if (x + 1 < w) gray[(y + 1) * w + (x + 1)] += err;
+          }
+          if (y + 2 < h) {
+            gray[(y + 2) * w + x] += err;
+          }
+        }
+      }
+
+      for (var i = 0; i < w * h; i++) {
+        var v = gray[i] >= 128 ? 255 : 0;
+        d[i * 4] = v;
+        d[i * 4 + 1] = v;
+        d[i * 4 + 2] = v;
+        d[i * 4 + 3] = 255;
+      }
+    }
+
+    // 7-Segment LCD Digit Renderer
+    var SEG_MAP = {
+      '0': [1,1,1,1,1,1,0], '1': [0,1,1,0,0,0,0], '2': [1,1,0,1,1,0,1],
+      '3': [1,1,1,1,0,0,1], '4': [0,1,1,0,0,1,1], '5': [1,0,1,1,0,1,1],
+      '6': [1,0,1,1,1,1,1], '7': [1,1,1,0,0,0,0], '8': [1,1,1,1,1,1,1],
+      '9': [1,1,1,1,0,1,1], '-': [0,0,0,0,0,0,1], ' ': [0,0,0,0,0,0,0]
+    };
+
+    function drawLCDDigit(ctx, x, y, char, L, T, slant, color, unlitColor) {
+      if (!SEG_MAP[char]) return;
+      var segs = SEG_MAP[char];
+      var G = T * 0.35;
+
+      function pt(px, py) {
+        var normY = (py - y) / (2 * L);
+        return { x: px + (1.0 - normY) * slant, y: py };
+      }
+
+      function drawPoly(pts, fill) {
+        ctx.fillStyle = fill;
+        ctx.beginPath();
+        var p0 = pt(pts[0][0], pts[0][1]);
+        ctx.moveTo(p0.x, p0.y);
+        for (var i = 1; i < pts.length; i++) {
+          var p = pt(pts[i][0], pts[i][1]);
+          ctx.lineTo(p.x, p.y);
+        }
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      var polys = [
+        [[x + G, y], [x + L - G, y], [x + L - G - T/2, y + T], [x + G + T/2, y + T]], // a
+        [[x + L, y + G], [x + L, y + L - G], [x + L - T, y + L - G - T/2], [x + L - T, y + G + T/2]], // b
+        [[x + L, y + L + G], [x + L, y + 2*L - G], [x + L - T, y + 2*L - G - T/2], [x + L - T, y + L + G + T/2]], // c
+        [[x + G + T/2, y + 2*L - T], [x + L - G - T/2, y + 2*L - T], [x + L - G, y + 2*L], [x + G, y + 2*L]], // d
+        [[x, y + L + G], [x + T, y + L + G + T/2], [x + T, y + 2*L - G - T/2], [x, y + 2*L - G]], // e
+        [[x, y + G], [x + T, y + G + T/2], [x + T, y + L - G - T/2], [x, y + L - G]], // f
+        [[x + G + T/2, y + L - T/2], [x + L - G - T/2, y + L - T/2], [x + L - G, y + L], [x + L - G - T/2, y + L + T/2], [x + G + T/2, y + L + T/2], [x + G, y + L]] // g
+      ];
+
+      for (var i = 0; i < 7; i++) drawPoly(polys[i], unlitColor);
+      for (var i = 0; i < 7; i++) {
+        if (segs[i]) drawPoly(polys[i], color);
+      }
+    }
+
+    // Main Archive Generator
+    function generateArchive() {
+      if (!loadedImage) {
+        loadSampleImage();
+        return;
+      }
+
+      var canvas = document.getElementById('renderCanvas');
+      var ctx = canvas.getContext('2d');
+
+      if (currentMode === 'A') {
+        renderReceiptMode(canvas, ctx);
+      } else {
+        renderPolaroidMode(canvas, ctx);
+      }
+
+      canvas.style.display = 'block';
+      document.getElementById('emptyState').style.display = 'none';
+      document.getElementById('btnDownload').disabled = false;
+    }
+
+    // MODE A RENDERING
+    function renderReceiptMode(canvas, ctx) {
+      var paperWidth = parseInt(document.getElementById('receiptWidth').value) || 580;
+      var ditherType = document.getElementById('ditherAlgo').value;
+      var title = (document.getElementById('receiptTitle').value || "TIGRAN SOLOMON'S PAPER ARCHIVE").toUpperCase();
+      var tornEdges = document.getElementById('receiptTornEdge').checked;
+      var dateInput = document.getElementById('receiptDate').value.trim();
+      var dateStr = dateInput || new Date().toISOString().replace('T', ' ').substr(0, 19);
+
+      var lines = document.getElementById('receiptItems').value.split('\n')
+        .map(function(l) { return l.trim(); })
+        .filter(function(l) { return l.length > 0; });
+
+      if (lines.length === 0) {
+        lines = ["SILVER HALIDE GELATIN", "THERMAL EMULSION 58MM", "1-BIT DIFFUSION MATRIX", "ANALOG LATENT PRINT"];
+      }
+
+      // Scaled photo dimensions
+      var sideMargin = paperWidth <= 580 ? 36 : 50;
+      var photoW = paperWidth - (sideMargin * 2);
+      var aspect = loadedImage.height / loadedImage.width;
+      var photoH = Math.min(Math.round(photoW * aspect), Math.round(paperWidth * 1.3));
+
+      // Calculate total height
+      var topPadding = 40;
+      var headerH = 140;
+      var tableH = 80 + (lines.length * 28) + 70;
+      var qrH = 180;
+      var footerH = 90;
+      var totalH = topPadding + headerH + photoH + tableH + qrH + footerH + 30;
+
+      canvas.width = paperWidth;
+      canvas.height = totalH;
+
+      // Draw white receipt tape
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, paperWidth, totalH);
+
+      // Render 1-bit dithered photo onto offscreen canvas
+      var offCanvas = document.createElement('canvas');
+      offCanvas.width = photoW;
+      offCanvas.height = photoH;
+      var offCtx = offCanvas.getContext('2d');
+      offCtx.drawImage(loadedImage, 0, 0, photoW, photoH);
+      var imgData = offCtx.getImageData(0, 0, photoW, photoH);
+
+      if (ditherType === 'atkinson') {
+        atkinsonDither(imgData);
+      } else {
+        floydSteinbergDither(imgData);
+      }
+      offCtx.putImageData(imgData, 0, 0);
+
+      // Draw Typography on Receipt
+      ctx.fillStyle = '#000000';
+      ctx.textAlign = 'center';
+
+      var cursorY = topPadding + 14;
+      ctx.font = '18px "VT323", monospace';
+      ctx.fillText('* * * * * * * * * * * * * * * * *', paperWidth / 2, cursorY);
+      cursorY += 28;
+
+      ctx.font = 'bold 30px "VT323", monospace';
+      ctx.fillText(title, paperWidth / 2, cursorY);
+      cursorY += 24;
+
+      ctx.font = '18px "VT323", monospace';
+      ctx.fillText('ANALOG MEMORY RETRIEVAL DIVISION', paperWidth / 2, cursorY);
+      cursorY += 20;
+      ctx.fillText('TERMINAL #01 // ' + paperWidth + 'PX THERMAL TAPE', paperWidth / 2, cursorY);
+      cursorY += 22;
+
+      ctx.fillText('=========================================', paperWidth / 2, cursorY);
+      cursorY += 16;
+
+      // Draw photo with border
+      var photoX = (paperWidth - photoW) / 2;
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#000000';
+      ctx.strokeRect(photoX - 3, cursorY - 3, photoW + 6, photoH + 6);
+      ctx.drawImage(offCanvas, photoX, cursorY);
+      cursorY += photoH + 22;
+
+      ctx.font = '17px "VT323", monospace';
+      ctx.fillText('[ FIGURE 01: LATENT ARTIFACT CAPTURE ]', paperWidth / 2, cursorY);
+      cursorY += 22;
+      ctx.fillText('- - - - - - - - - - - - - - - - - - - - -', paperWidth / 2, cursorY);
+      cursorY += 24;
+
+      // Table Header
+      ctx.textAlign = 'left';
+      ctx.font = 'bold 22px "VT323", monospace';
+      var colQty = sideMargin;
+      var colDesc = sideMargin + 48;
+      var colStat = paperWidth - sideMargin - 65;
+
+      ctx.fillText('QTY', colQty, cursorY);
+      ctx.fillText('DESCRIPTION', colDesc, cursorY);
+      ctx.fillText('STAT', colStat, cursorY);
+      cursorY += 8;
+
+      ctx.beginPath();
+      ctx.moveTo(sideMargin, cursorY);
+      ctx.lineTo(paperWidth - sideMargin, cursorY);
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      cursorY += 20;
+
+      // Items
+      ctx.font = '20px "VT323", monospace';
+      for (var i = 0; i < lines.length; i++) {
+        var num = (i + 1 < 10 ? '0' : '') + (i + 1);
+        ctx.fillText(num, colQty, cursorY);
+        ctx.fillText(lines[i].toUpperCase().substr(0, 24), colDesc, cursorY);
+        ctx.fillText('OK', colStat, cursorY);
+        cursorY += 26;
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(sideMargin, cursorY);
+      ctx.lineTo(paperWidth - sideMargin, cursorY);
+      ctx.stroke();
+      cursorY += 22;
+
+      ctx.font = 'bold 20px "VT323", monospace';
+      ctx.fillText('ARCHIVE INTEGRITY:', colDesc, cursorY);
+      ctx.fillText('100%', colStat - 10, cursorY);
+      cursorY += 24;
+      ctx.fillText('AUTHENTICITY:', colDesc, cursorY);
+      ctx.fillText('PASS', colStat - 10, cursorY);
+      cursorY += 26;
+
+      ctx.textAlign = 'center';
+      ctx.font = '18px "VT323", monospace';
+      ctx.fillText('=========================================', paperWidth / 2, cursorY);
+      cursorY += 22;
+
+      var randSuffix = Math.floor(Math.random() * 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+      var archiveId = 'ARC-' + Math.floor(Date.now() / 1000) + '-' + randSuffix;
+
+      ctx.font = 'bold 22px "VT323", monospace';
+      ctx.fillText('INDEX NO: ' + archiveId, paperWidth / 2, cursorY);
+      cursorY += 24;
+      ctx.font = '18px "VT323", monospace';
+      ctx.fillText('TIMESTAMP: ' + dateStr, paperWidth / 2, cursorY);
+      cursorY += 28;
+
+      // Draw QR Code
+      try {
+        var qr = QRCodeLib.generateMatrix(archiveId + ' | ' + title);
+        var qrSize = qr.getModuleCount();
+        var cellSize = paperWidth <= 580 ? 4 : 5;
+        var qrTotalW = qrSize * cellSize;
+        var qrStartX = (paperWidth - qrTotalW) / 2;
+
+        ctx.fillStyle = '#000000';
+        for (var r = 0; r < qrSize; r++) {
+          for (var c = 0; c < qrSize; c++) {
+            if (qr.isDark(r, c)) {
+              ctx.fillRect(qrStartX + c * cellSize, cursorY + r * cellSize, cellSize, cellSize);
+            }
+          }
+        }
+        cursorY += qrTotalW + 18;
+      } catch (e) {
+        cursorY += 20;
+      }
+
+      ctx.font = '16px "VT323", monospace';
+      ctx.fillText('SCAN TO ACCESS PAPER ARCHIVE', paperWidth / 2, cursorY);
+      cursorY += 22;
+      ctx.fillText('KEEP AWAY FROM DIRECT HEAT & SUNLIGHT', paperWidth / 2, cursorY);
+      cursorY += 20;
+      ctx.fillText('* * * THANK YOU FOR ARCHIVING * * *', paperWidth / 2, cursorY);
+      cursorY += 28;
+
+      // Cut to exact height with serrated edges
+      var finalH = cursorY;
+      var trimmedCanvas = document.createElement('canvas');
+      trimmedCanvas.width = paperWidth;
+      trimmedCanvas.height = finalH;
+      var tCtx = trimmedCanvas.getContext('2d');
+      tCtx.drawImage(canvas, 0, 0);
+
+      if (tornEdges) {
+        // Apply zigzag cut at top and bottom
+        tCtx.globalCompositeOperation = 'destination-out';
+        tCtx.fillStyle = '#000000';
+
+        var toothH = 12, toothW = 16;
+        // Top edge
+        tCtx.beginPath();
+        tCtx.moveTo(0, 0);
+        var x = 0, up = true;
+        while (x <= paperWidth) {
+          tCtx.lineTo(x, up ? toothH : 0);
+          x += toothW;
+          up = !up;
+        }
+        tCtx.lineTo(paperWidth, 0);
+        tCtx.closePath();
+        tCtx.fill();
+
+        // Bottom edge
+        tCtx.beginPath();
+        tCtx.moveTo(0, finalH);
+        x = 0; up = true;
+        while (x <= paperWidth) {
+          tCtx.lineTo(x, up ? finalH - toothH : finalH);
+          x += toothW;
+          up = !up;
+        }
+        tCtx.lineTo(paperWidth, finalH);
+        tCtx.closePath();
+        tCtx.fill();
+        tCtx.globalCompositeOperation = 'source-over';
+      }
+
+      canvas.width = paperWidth;
+      canvas.height = finalH;
+      ctx.clearRect(0, 0, paperWidth, finalH);
+      ctx.drawImage(trimmedCanvas, 0, 0);
+    }
+
+    // MODE B RENDERING (POLAROID)
+    function renderPolaroidMode(canvas, ctx) {
+      var canvasWidth = 1000;
+      var aspectChoice = document.getElementById('polaroidAspect').value;
+      var caption = document.getElementById('polaroidCaption').value || "Tigran Solomon's Paper Archive";
+      var dateInput = document.getElementById('polaroidDate').value.trim();
+      var lightLeak = document.getElementById('polaroidLightLeak').checked;
+      var vignette = document.getElementById('polaroidVignette').checked;
+
+      // Format LCD date string
+      var dateStr = "'98 04 18";
+      if (dateInput) {
+        var clean = dateInput.replace(/[\/\.]/g, '-').split('-');
+        if (clean.length === 3) {
+          dateStr = "'" + clean[0].substr(-2) + " " + clean[1].padStart(2, '0') + " " + clean[2].padStart(2, '0');
+        } else {
+          dateStr = dateInput;
+        }
+      }
+
+      var sideMargin = Math.round(canvasWidth * 0.065);
+      var topMargin = Math.round(canvasWidth * 0.065);
+      var photoW = canvasWidth - (sideMargin * 2);
+      var photoH = (aspectChoice === '4:5') ? Math.round(photoW * 1.25) : photoW;
+      var bottomMargin = Math.round(photoH * 0.36);
+      var totalH = topMargin + photoH + bottomMargin;
+
+      canvas.width = canvasWidth;
+      canvas.height = totalH;
+
+      // 1. Off-white vintage paper frame (#FAF7F2)
+      ctx.fillStyle = '#faf7f2';
+      ctx.fillRect(0, 0, canvasWidth, totalH);
+
+      // 2. Paper grain texture on frame
+      var grainCanvas = document.createElement('canvas');
+      grainCanvas.width = 120;
+      grainCanvas.height = 120;
+      var gCtx = grainCanvas.getContext('2d');
+      var gData = gCtx.createImageData(120, 120);
+      for (var i = 0; i < 120 * 120; i++) {
+        var n = Math.floor(Math.random() * 40);
+        gData.data[i * 4] = n;
+        gData.data[i * 4 + 1] = n;
+        gData.data[i * 4 + 2] = n;
+        gData.data[i * 4 + 3] = 16;
+      }
+      gCtx.putImageData(gData, 0, 0);
+      var grainPattern = ctx.createPattern(grainCanvas, 'repeat');
+      ctx.fillStyle = grainPattern;
+      ctx.fillRect(0, 0, canvasWidth, totalH);
+
+      // 3. Render Photo inside Cutout (Center crop)
+      var pCanvas = document.createElement('canvas');
+      pCanvas.width = photoW;
+      pCanvas.height = photoH;
+      var pCtx = pCanvas.getContext('2d');
+
+      var sAspect = loadedImage.width / loadedImage.height;
+      var tAspect = photoW / photoH;
+      var sx = 0, sy = 0, sw = loadedImage.width, sh = loadedImage.height;
+      if (sAspect > tAspect) {
+        sw = loadedImage.height * tAspect;
+        sx = (loadedImage.width - sw) / 2;
+      } else {
+        sh = loadedImage.width / tAspect;
+        sy = (loadedImage.height - sh) / 2;
+      }
+      pCtx.drawImage(loadedImage, sx, sy, sw, sh, 0, 0, photoW, photoH);
+
+      // Polaroid Tone Curves & Lifted Blacks
+      var pImgData = pCtx.getImageData(0, 0, photoW, photoH);
+      var pd = pImgData.data;
+      for (var i = 0; i < pd.length; i += 4) {
+        var r = pd[i], g = pd[i + 1], b = pd[i + 2];
+        // Lifted faded blacks (~32) + warm highlights
+        pd[i] = Math.min(255, 32 + Math.pow(r / 255, 0.88) * (252 - 32));
+        pd[i + 1] = Math.min(255, 28 + Math.pow(g / 255, 0.95) * (245 - 28));
+        pd[i + 2] = Math.min(255, 36 + Math.pow(b / 255, 1.15) * (228 - 36));
+      }
+      pCtx.putImageData(pImgData, 0, 0);
+
+      // Vignette
+      if (vignette) {
+        var vGrad = pCtx.createRadialGradient(photoW/2, photoH/2, photoW*0.35, photoW/2, photoH/2, photoW*0.75);
+        vGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+        vGrad.addColorStop(1, 'rgba(0, 0, 0, 0.42)');
+        pCtx.fillStyle = vGrad;
+        pCtx.fillRect(0, 0, photoW, photoH);
+      }
+
+      // Light Leak Flare
+      if (lightLeak) {
+        pCtx.globalCompositeOperation = 'screen';
+        var leakGrad = pCtx.createRadialGradient(photoW * 0.9, photoH * 0.1, 10, photoW * 0.9, photoH * 0.1, photoW * 0.65);
+        leakGrad.addColorStop(0, 'rgba(255, 180, 50, 0.55)');
+        leakGrad.addColorStop(0.5, 'rgba(235, 75, 20, 0.25)');
+        leakGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        pCtx.fillStyle = leakGrad;
+        pCtx.fillRect(0, 0, photoW, photoH);
+        pCtx.globalCompositeOperation = 'source-over';
+      }
+
+      // Draw 90s Quartz LCD Date Stamp in Bottom-Right
+      var stampScale = 1.0;
+      var segLen = 16 * stampScale, segThick = 4.2 * stampScale;
+      var digitW = segLen + (segThick * 1.5);
+      var slant = 4.5 * stampScale;
+      var charSpacing = 6 * stampScale, wordSpacing = 18 * stampScale;
+
+      var stampTotalW = 0;
+      for (var k = 0; k < dateStr.length; k++) {
+        var ch = dateStr[k];
+        if (ch === ' ') stampTotalW += wordSpacing;
+        else if (ch === "'" || ch === '`') stampTotalW += segLen * 0.4 + charSpacing;
+        else stampTotalW += digitW + charSpacing;
+      }
+
+      var stampX = photoW - stampTotalW - 24;
+      var stampY = photoH - (2 * segLen + 10) - 22;
+
+      // Glow layer
+      pCtx.shadowColor = 'rgba(255, 120, 0, 0.85)';
+      pCtx.shadowBlur = 10;
+      var curX = stampX;
+      for (var k = 0; k < dateStr.length; k++) {
+        var ch = dateStr[k];
+        if (ch === ' ') {
+          curX += wordSpacing;
+        } else if (ch === "'" || ch === '`') {
+          pCtx.fillStyle = '#ff9922';
+          pCtx.fillRect(curX, stampY + 4, segThick, segThick * 2.2);
+          curX += segLen * 0.4 + charSpacing;
+        } else {
+          drawLCDDigit(pCtx, curX, stampY, ch, segLen, segThick, slant, '#ffaa22', 'rgba(60, 20, 0, 0.25)');
+          curX += digitW + charSpacing;
+        }
+      }
+      pCtx.shadowBlur = 0; // Reset shadow
+
+      // Paste photo into frame with bevel border
+      ctx.drawImage(pCanvas, sideMargin, topMargin);
+
+      ctx.strokeStyle = 'rgba(200, 195, 185, 0.8)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(sideMargin, topMargin, photoW, photoH);
+
+      // Handwritten Signature on bottom margin
+      ctx.fillStyle = '#222224';
+      ctx.textAlign = 'center';
+      ctx.font = '46px "Caveat", cursive';
+      var textY = topMargin + photoH + (bottomMargin / 2) + 12;
+      ctx.fillText(caption, canvasWidth / 2, textY);
+    }
+
+    // Download Handler
+    function downloadArchive() {
+      var canvas = document.getElementById('renderCanvas');
+      var link = document.createElement('a');
+      link.download = (currentMode === 'A') ? 'archive_receipt.png' : 'archive_polaroid.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // Auto-init on load
+    window.onload = function() {
+      loadSampleImage();
+    };
+  </script>
+</body>
+</html>
