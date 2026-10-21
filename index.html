@@ -1180,26 +1180,139 @@
       color: var(--yellow);
     }
 
-    /* ─── RESPONSIVE ─────────────────────────────────────── */
+        /* ─── BURGER MENU & RESPONSIVE BREAKPOINTS ────────── */
+    .burger-btn {
+      display: none;
+      background: #1c1c24;
+      border: 1px solid #383844;
+      color: var(--white);
+      width: 44px;
+      height: 44px;
+      border-radius: 8px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 5px;
+      padding: 0;
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .burger-btn span {
+      display: block;
+      width: 20px;
+      height: 2px;
+      background: var(--white);
+      border-radius: 2px;
+      transition: transform 0.25s, opacity 0.25s;
+    }
+    .burger-btn.is-active span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg);
+    }
+    .burger-btn.is-active span:nth-child(2) {
+      opacity: 0;
+    }
+    .burger-btn.is-active span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg);
+    }
+
+    .mobile-nav-drawer {
+      display: none;
+      position: fixed;
+      top: 69px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(14, 14, 18, 0.98);
+      backdrop-filter: blur(18px);
+      z-index: 490;
+      padding: 24px 20px;
+      flex-direction: column;
+      gap: 16px;
+      overflow-y: auto;
+    }
+    .mobile-nav-drawer.is-open {
+      display: flex;
+    }
+    .mobile-nav-drawer a.nav-link {
+      font-size: 1.1rem;
+      padding: 14px 18px;
+      border-radius: 10px;
+      background: #1a1a22;
+      border: 1px solid #282834;
+      color: var(--white);
+      text-align: center;
+    }
+    .mobile-nav-drawer .nav-cta-btn {
+      width: 100%;
+      justify-content: center;
+      padding: 15px 20px;
+      font-size: 0.95rem;
+      margin-top: 8px;
+    }
+
+    /* ─── TABLET BREAKPOINT (481px — 980px) ──────────────── */
     @media (max-width: 980px) {
-      nav { padding: 10px 16px; flex-wrap: wrap; gap: 8px; }
+      nav { padding: 12px 20px; }
       .nav-center { display: none; }
-      .nav-right { width: 100%; justify-content: space-between; }
-      .hero { padding: 16px 12px 36px; }
-      .hero-frame { padding: 28px 16px 24px; border-radius: 12px; }
-      .hero-layout { grid-template-columns: 1fr; gap: 24px; }
-      .hero-visual { display: flex; transform: scale(0.85); margin: -20px auto; }
-      .hero-cta-group { flex-direction: column; width: 100%; }
-      .btn-hero-main, .btn-hero-ghost { width: 100%; justify-content: center; }
-      .action-badge { font-size: 2rem; }
+      .burger-btn { display: flex; }
+      .hero { padding: 24px 16px 40px; }
+      .hero-frame { padding: 36px 24px; border-radius: 14px; }
+      .hero-layout { grid-template-columns: 1fr; gap: 32px; }
+      .hero-visual { display: flex; transform: scale(0.92); margin: -10px auto; }
+      .hero-cta-group { flex-direction: row; flex-wrap: wrap; }
+      .action-badge { font-size: 2.4rem; }
       .spinning-badge { display: none; }
-      .marquee-bands { height: 110px; margin-top: -15px; }
-      .band-track { font-size: 0.85rem; }
-      .section-dark, .section-paper, .section-contacts { padding: 50px 16px; }
-      .steps-grid { grid-template-columns: 1fr; gap: 16px; }
-      .gallery-grid { grid-template-columns: 1fr; gap: 20px; }
-      .contacts-card { grid-template-columns: 1fr; padding: 28px 18px; gap: 28px; }
-      footer { flex-direction: column; gap: 12px; text-align: center; padding: 20px 16px; }
+      .marquee-bands { height: 120px; margin-top: -20px; margin-bottom: 20px; }
+      .band-track { font-size: 0.95rem; }
+      .section-dark, .section-paper, .section-contacts { padding: 60px 20px; }
+      .steps-grid { grid-template-columns: 1fr; gap: 18px; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; gap: 20px; }
+      .contacts-card { grid-template-columns: 1fr; padding: 36px 24px; gap: 32px; }
+      footer { padding: 20px; flex-wrap: wrap; gap: 14px; }
+    }
+
+    /* ─── MOBILE PHONES (<= 480px) ───────────────────────── */
+    @media (max-width: 480px) {
+      nav { padding: 10px 14px; }
+      .nav-logo-text { font-size: 1.15rem; }
+      .nav-tagline { font-size: 0.55rem; letter-spacing: 1.2px; }
+      .nav-right .nav-cta-btn { display: none; }
+      .lang-btn { min-width: 38px; min-height: 38px; font-size: 0.75rem; padding: 6px 9px; }
+      
+      .hero { padding: 12px 10px 30px; }
+      .hero-frame { padding: 22px 14px 20px; border-radius: 12px; }
+      .hero-eyebrow-pill { font-size: 0.62rem; padding: 4px 10px; }
+      .hero-subhead { font-size: 0.78rem; letter-spacing: 2px; }
+      .title-line-underlined { font-size: 1.9rem; }
+      .title-brand-row { font-size: 2.2rem; }
+      .action-badge { font-size: 1.8rem; padding: 3px 10px; }
+      .feature-item { font-size: 0.8rem; }
+      .hero-cta-group { flex-direction: column; width: 100%; gap: 10px; }
+      .btn-hero-main, .btn-hero-ghost { width: 100%; min-height: 48px; justify-content: center; font-size: 0.88rem; }
+      
+      .hero-visual { display: flex; transform: scale(0.8); margin: -30px auto -20px; }
+      .stickers-bar { gap: 8px; }
+      .diecut-sticker { font-size: 0.62rem; padding: 5px 10px; }
+      .hero-footer-note { font-size: 0.6rem; letter-spacing: 1.5px; }
+
+      .marquee-bands { height: 95px; margin-top: -10px; margin-bottom: 10px; }
+      .band-track { font-size: 0.8rem; }
+      
+      .sec-headline { font-size: 1.5rem; margin-bottom: 28px; }
+      .step-card { padding: 24px 18px; }
+      .gallery-grid { grid-template-columns: 1fr; }
+      .artifact-preview { padding: 14px; }
+      .artifact-receipt-mini, .artifact-polaroid-mini { width: 92%; }
+
+      .contacts-card { padding: 24px 16px; border-radius: 14px; }
+      .contacts-title { font-size: 1.6rem; }
+      .contacts-lead { font-size: 0.85rem; }
+      .btn-instagram { width: 100%; min-height: 46px; justify-content: center; }
+      .author-badge-card { padding: 20px 16px; }
+
+      footer { flex-direction: column; text-align: center; gap: 12px; padding: 18px 14px; }
+      .footer-links { flex-direction: column; gap: 8px; }
     }
   </style>
 </head>
@@ -1220,6 +1333,9 @@
     </ul>
 
     <div class="nav-right">
+      <button type="button" class="burger-btn" id="burgerBtn" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
       <!-- 3-Language switcher: EN primary, then HY, then RU -->
       <div class="lang-switcher">
         <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
@@ -1231,7 +1347,15 @@
         <span>⚡</span> CREATE RETRO / RECEIPT
       </a>
     </div>
-  </nav>
+    <!-- Mobile Nav Drawer -->
+  <div class="mobile-nav-drawer" id="mobileDrawer">
+    <a href="#" class="nav-link" data-i18n="nav_home" onclick="closeMobileNav()">HOME</a>
+    <a href="#how" class="nav-link" data-i18n="nav_how" onclick="closeMobileNav()">HOW IT WORKS</a>
+    <a href="#gallery" class="nav-link" data-i18n="nav_gallery" onclick="closeMobileNav()">EXAMPLES</a>
+    <a href="#contacts" class="nav-link" data-i18n="nav_contacts" onclick="closeMobileNav()">CONTACTS</a>
+    <a href="studio.html" class="nav-cta-btn" data-i18n="nav_cta">⚡ CREATE RETRO / RECEIPT</a>
+  </div>
+</nav>
 
   <!-- ─── HERO ───────────────────────────────────────────── -->
   <section class="hero">
@@ -1735,6 +1859,21 @@
       } catch (e) {}
       setLang(saved);
     });
+    // Mobile Navigation Drawer Toggle
+    var burgerBtn = document.getElementById('burgerBtn');
+    var mobileDrawer = document.getElementById('mobileDrawer');
+    if (burgerBtn && mobileDrawer) {
+      burgerBtn.addEventListener('click', function() {
+        var isOpen = mobileDrawer.classList.toggle('is-open');
+        burgerBtn.classList.toggle('is-active', isOpen);
+      });
+    }
+    function closeMobileNav() {
+      if (burgerBtn && mobileDrawer) {
+        mobileDrawer.classList.remove('is-open');
+        burgerBtn.classList.remove('is-active');
+      }
+    }
   </script>
 </body>
 </html>
