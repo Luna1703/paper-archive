@@ -20,6 +20,8 @@ from image_loader import load_and_validate_image
 ASSETS_DIR = Path(__file__).parent / "assets" / "fonts"
 DEFAULT_PIXEL_FONT = ASSETS_DIR / "VT323-Regular.ttf"
 ALT_PIXEL_FONT = ASSETS_DIR / "PressStart2P-Regular.ttf"
+ARCHIVE_WEBSITE_URL = "https://luna1703.github.io/paper-archive/"
+QR_CODE_IMAGE_PATH = Path(__file__).parent / "assets" / "qr_code.png"
 
 
 def get_font(font_path: Path, size: int) -> ImageFont.ImageFont:
@@ -126,10 +128,10 @@ def generate_archive_id() -> str:
     return f"ARC-{ts}-{rand_suffix}"
 
 
-def generate_qr_code(payload: str, box_size: int = 5, border: int = 2) -> Image.Image:
+def generate_qr_code(payload: str = ARCHIVE_WEBSITE_URL, box_size: int = 5, border: int = 2) -> Image.Image:
     """Generates a clean 1-bit QR code."""
     qr = qrcode.QRCode(
-        version=1,
+        version=None,
         error_correction=qrcode.constants.ERROR_CORRECT_M,
         box_size=box_size,
         border=border,
@@ -138,6 +140,21 @@ def generate_qr_code(payload: str, box_size: int = 5, border: int = 2) -> Image.
     qr.make(fit=True)
     qr_img = qr.make_image(fill_color="black", back_color="white").convert("L")
     return qr_img
+
+
+def load_archive_qr_code(paper_width: int) -> Image.Image:
+    """
+    Loads the official static QR code linking to the Paper Archive website,
+    or generates one using the canonical website URL if asset is missing.
+    """
+    target_size = 170 if paper_width <= 580 else 230
+    if QR_CODE_IMAGE_PATH.exists():
+        try:
+            with Image.open(QR_CODE_IMAGE_PATH) as img:
+                return img.convert("L").resize((target_size, target_size), Image.Resampling.NEAREST)
+        except Exception:
+            pass
+    return generate_qr_code(ARCHIVE_WEBSITE_URL, box_size=4 if paper_width <= 580 else 6, border=2)
 
 
 def create_torn_edge_mask(width: int, height: int, tooth_height: int = 12, tooth_width: int = 16) -> Image.Image:
@@ -262,9 +279,8 @@ def process_receipt(
     else:
         items_list = default_items
 
-    # 4. Generate QR code
-    qr_payload = f"{archive_id} | {title} | {date_str}"
-    qr_img = generate_qr_code(qr_payload, box_size=4 if paper_width <= 580 else 6, border=2)
+    # 4. Load official static website QR code
+    qr_img = load_archive_qr_code(paper_width)
 
     # 5. Measure layout and heights
     font_title = get_font(DEFAULT_PIXEL_FONT, 32 if paper_width <= 580 else 44)
@@ -386,7 +402,9 @@ def process_receipt(
     cursor_y += qr_img.height + 12
 
     draw_centered("SCAN TO ACCESS PAPER ARCHIVE", cursor_y, font_small)
-    cursor_y += 24
+    cursor_y += 20
+    draw_centered("HTTPS://LUNA1703.GITHUB.IO/PAPER-ARCHIVE", cursor_y, font_small)
+    cursor_y += 22
 
     draw_centered(". . . . . . . . . . . . . . . . .", cursor_y, font_small)
     cursor_y += 20
