@@ -1,197 +1,259 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RETRO CHECK — Твои фото. В ретро. На чеке.</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>RETRO CHECK — Photo to Receipt &amp; Polaroid Analog Archive</title>
+  <meta name="description" content="Transform your photos into 1-bit thermal receipts and 90s vintage Polaroids directly in your browser. Created by Tigran Khanoyan (@tkhanoyan).">
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@300;400;500;600;700;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=VT323&display=swap" rel="stylesheet">
 
   <style>
-    /* ─── RESET ─────────────────────────────────────────── */
+    /* ─── RESET & DEFAULTS ───────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
 
-    /* ─── TOKENS ─────────────────────────────────────────── */
     :root {
-      --bg-chrome:   #1a1a1a;
-      --bg-paper:    #f5f2ec;
-      --bg-paper2:   #ede9e0;
-      --ink:         #181818;
-      --ink-soft:    #3d3b38;
-      --ink-muted:   #7a7672;
-      --yellow:      #f0d84a;
-      --yellow-dark: #c9a800;
-      --accent-red:  #c53030;
-      --white:       #fff;
-      --font-sans:   'Inter', sans-serif;
-      --font-mono:   'Space Mono', monospace;
-      --font-pixel:  'VT323', monospace;
-      --font-hand:   'Caveat', cursive;
+      --bg-chrome:    #141416;
+      --bg-card:      #1a1a1f;
+      --bg-paper:     #f5f2ec;
+      --bg-paper-dark:#ede8de;
+      --ink:          #161616;
+      --ink-soft:     #3a3834;
+      --ink-muted:    #747069;
+      --yellow:       #f0d84a;
+      --yellow-glow:  rgba(240, 216, 74, 0.4);
+      --red:          #e0245b;
+      --tape:         #e7ddc4;
+      --white:        #ffffff;
+      --border-dark:  #282830;
+      
+      --font-sans:    'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono:    'Space Mono', monospace;
+      --font-pixel:   'VT323', monospace;
+      --font-hand:    'Caveat', cursive;
+      --ease-spring:  cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
     body {
       background: var(--bg-chrome);
+      color: var(--white);
       font-family: var(--font-sans);
       min-height: 100vh;
       overflow-x: hidden;
+      line-height: 1.5;
     }
 
-    /* ─── PAPER TEXTURE SVG NOISE ───────────────────────── */
+    /* Ambient noise background */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
       pointer-events: none;
-      z-index: 0;
+      z-index: 1000;
     }
 
-    /* ─── NAV ────────────────────────────────────────────── */
+    /* ─── NAVIGATION ─────────────────────────────────────── */
     nav {
       position: sticky;
       top: 0;
-      z-index: 100;
-      background: var(--bg-chrome);
-      padding: 14px 32px;
+      z-index: 500;
+      background: rgba(20, 20, 22, 0.92);
+      backdrop-filter: blur(14px);
+      padding: 14px 36px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid #2e2e2e;
+      border-bottom: 1px solid var(--border-dark);
     }
 
-    .nav-logo {
+    .nav-brand {
       display: flex;
       flex-direction: column;
-      line-height: 1;
+      text-decoration: none;
     }
 
-    .nav-logo-main {
-      font-family: var(--font-sans);
+    .nav-logo-text {
       font-weight: 900;
       font-size: 1.35rem;
       letter-spacing: -0.5px;
       color: var(--white);
+      display: flex;
+      align-items: center;
+      gap: 3px;
     }
 
-    .nav-logo-main span { color: var(--yellow); }
+    .nav-logo-text span {
+      color: var(--yellow);
+    }
 
-    .nav-logo-sub {
-      font-size: 0.6rem;
-      letter-spacing: 2.5px;
+    .nav-tagline {
+      font-size: 0.62rem;
+      letter-spacing: 2px;
       text-transform: uppercase;
-      color: #666;
-      margin-top: 2px;
+      color: #888;
+      font-family: var(--font-mono);
+      margin-top: 1px;
     }
 
-    .nav-links {
+    .nav-center {
       display: flex;
       align-items: center;
       gap: 6px;
       list-style: none;
     }
 
-    .nav-links a {
-      display: inline-block;
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 500;
-      letter-spacing: 0.3px;
+    .nav-link {
+      padding: 7px 15px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
       text-decoration: none;
-      color: #aaa;
-      border: 1px solid #333;
+      color: #9c9ca8;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .nav-link:hover {
+      color: var(--white);
+      border-color: #383844;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Language switcher */
+    .lang-switcher {
+      display: inline-flex;
+      background: #1c1c22;
+      border: 1px solid #33333e;
+      border-radius: 999px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .lang-btn {
+      background: transparent;
+      border: none;
+      color: #8e8e98;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 5px 11px;
+      border-radius: 999px;
+      cursor: pointer;
       transition: all 0.18s;
     }
 
-    .nav-links a:hover { color: var(--white); border-color: #555; }
-
-    .nav-cta {
-      background: var(--yellow) !important;
-      color: var(--ink) !important;
-      font-weight: 700 !important;
-      border-color: var(--yellow) !important;
-      padding: 8px 20px !important;
+    .lang-btn:hover {
+      color: var(--white);
     }
 
-    .nav-cta:hover {
-      background: #f7e55a !important;
-      transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(240,216,74,0.35);
+    .lang-btn.active {
+      background: var(--yellow);
+      color: var(--ink);
+    }
+
+    .nav-cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--yellow);
+      color: var(--ink);
+      padding: 9px 20px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-decoration: none;
+      border: 1.5px solid var(--yellow);
+      box-shadow: 2px 2px 0 #000;
+      transition: all 0.2s var(--ease-spring);
+      white-space: nowrap;
+    }
+
+    .nav-cta-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 4px 4px 0 #000;
+      background: #f7e158;
     }
 
     /* ─── HERO SECTION ───────────────────────────────────── */
     .hero {
       position: relative;
-      min-height: calc(100vh - 57px);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
       padding: 40px 24px 60px;
-      overflow: hidden;
-      background: var(--bg-chrome);
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
-    /* dark chrome frame with inner paper card */
     .hero-frame {
       position: relative;
       width: 100%;
-      max-width: 1180px;
+      max-width: 1200px;
       background: var(--bg-paper);
-      border-radius: 16px;
-      padding: 56px 64px 56px;
-      box-shadow:
-        0 0 0 2px #2e2e2e,
-        0 32px 80px rgba(0,0,0,0.6);
+      color: var(--ink);
+      border-radius: 18px;
+      padding: 52px 64px 44px;
+      box-shadow: 
+        0 0 0 2px #26262e,
+        0 24px 70px rgba(0, 0, 0, 0.65);
       overflow: hidden;
-      z-index: 1;
+      z-index: 2;
     }
 
-    /* paper grain on frame */
+    /* Paper texture inside frame */
     .hero-frame::before {
       content: '';
       position: absolute;
       inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
       pointer-events: none;
-      z-index: 0;
-      border-radius: 16px;
+      z-index: 1;
     }
 
-    /* corner crop marks */
+    /* Corner crop marks */
     .hero-frame::after {
       content: '';
       position: absolute;
-      inset: 16px;
-      border: none;
+      inset: 14px;
       background:
-        linear-gradient(var(--ink), var(--ink)) top left / 22px 2px no-repeat,
-        linear-gradient(var(--ink), var(--ink)) top left / 2px 22px no-repeat,
-        linear-gradient(var(--ink), var(--ink)) top right / 22px 2px no-repeat,
-        linear-gradient(var(--ink), var(--ink)) top right / 2px 22px no-repeat,
-        linear-gradient(var(--ink), var(--ink)) bottom left / 22px 2px no-repeat,
-        linear-gradient(var(--ink), var(--ink)) bottom left / 2px 22px no-repeat,
-        linear-gradient(var(--ink), var(--ink)) bottom right / 22px 2px no-repeat,
-        linear-gradient(var(--ink), var(--ink)) bottom right / 2px 22px no-repeat;
+        linear-gradient(var(--ink), var(--ink)) top left / 20px 2px no-repeat,
+        linear-gradient(var(--ink), var(--ink)) top left / 2px 20px no-repeat,
+        linear-gradient(var(--ink), var(--ink)) top right / 20px 2px no-repeat,
+        linear-gradient(var(--ink), var(--ink)) top right / 2px 20px no-repeat,
+        linear-gradient(var(--ink), var(--ink)) bottom left / 20px 2px no-repeat,
+        linear-gradient(var(--ink), var(--ink)) bottom left / 2px 20px no-repeat,
+        linear-gradient(var(--ink), var(--ink)) bottom right / 20px 2px no-repeat,
+        linear-gradient(var(--ink), var(--ink)) bottom right / 2px 20px no-repeat;
       pointer-events: none;
-      z-index: 0;
+      z-index: 1;
     }
 
-    .hero-inner {
+    .hero-layout {
       position: relative;
-      z-index: 2;
+      z-index: 3;
       display: grid;
-      grid-template-columns: 1fr 480px;
+      grid-template-columns: 1.15fr 0.85fr;
       gap: 48px;
       align-items: center;
     }
 
-    /* ─── HERO LEFT ──────────────────────────────────────── */
-    .hero-left { display: flex; flex-direction: column; gap: 24px; }
+    /* Left Copy */
+    .hero-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
 
-    .hero-eyebrow {
+    .hero-eyebrow-pill {
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -199,467 +261,544 @@
       color: var(--yellow);
       font-family: var(--font-mono);
       font-size: 0.68rem;
-      letter-spacing: 2.5px;
+      letter-spacing: 2px;
       text-transform: uppercase;
       padding: 5px 14px;
-      border-radius: 4px;
+      border-radius: 999px;
       width: fit-content;
     }
 
-    .hero-eyebrow-dot {
-      width: 6px; height: 6px;
+    .eyebrow-dot {
+      width: 7px;
+      height: 7px;
       background: var(--yellow);
       border-radius: 50%;
-      animation: blink 1.4s ease-in-out infinite;
+      box-shadow: 0 0 8px var(--yellow);
+      animation: pulse 1.8s infinite;
     }
 
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-    .hero-subtitle-big {
-      font-family: var(--font-sans);
+    .hero-subhead {
+      font-size: 0.95rem;
       font-weight: 800;
-      font-size: 1.05rem;
-      letter-spacing: 4px;
+      letter-spacing: 3.5px;
       text-transform: uppercase;
       color: var(--ink-soft);
+      font-family: var(--font-sans);
     }
 
-    .hero-title {
+    .hero-main-title {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      line-height: 0.96;
     }
 
-    .hero-title-line1 {
-      font-family: var(--font-sans);
+    .title-line-underlined {
+      font-size: clamp(2.3rem, 4vw, 3.7rem);
       font-weight: 900;
-      font-size: clamp(2.6rem, 4vw, 3.8rem);
+      letter-spacing: -1px;
       color: var(--ink);
-      line-height: 1;
       position: relative;
+      display: inline-block;
+      width: fit-content;
+      padding-bottom: 6px;
     }
 
-    .hero-title-line1::after {
+    .title-line-underlined::after {
       content: '';
       position: absolute;
       left: 0;
-      bottom: -3px;
+      bottom: 0;
       width: 100%;
-      height: 3px;
+      height: 4px;
       background: var(--ink);
     }
 
-    .hero-title-line2 {
-      font-family: var(--font-sans);
+    .title-brand-row {
+      font-size: clamp(2.6rem, 4.8vw, 4.3rem);
       font-weight: 900;
-      font-size: clamp(2.8rem, 4.5vw, 4.2rem);
+      letter-spacing: -1.5px;
       color: var(--ink);
-      line-height: 1;
+      margin-top: 10px;
     }
 
-    .hero-title-line2 em {
+    .title-brand-row em {
       font-style: normal;
       color: transparent;
       -webkit-text-stroke: 2.5px var(--ink);
-      letter-spacing: -1px;
     }
 
-    .hero-action-word {
-      font-family: var(--font-sans);
-      font-weight: 900;
-      font-size: clamp(3.2rem, 5.5vw, 5rem);
-      color: var(--ink);
-      line-height: 0.95;
-      position: relative;
+    .hero-action-banner {
+      margin-top: 4px;
+    }
+
+    .action-badge {
       display: inline-block;
-    }
-
-    .hero-action-word .yellow-bg {
       background: var(--yellow);
-      padding: 2px 10px 4px;
-      display: inline-block;
-      transform: rotate(-0.8deg);
+      color: var(--ink);
+      font-weight: 900;
+      font-size: clamp(2.4rem, 4.2vw, 3.8rem);
+      line-height: 1;
+      padding: 4px 14px 6px;
+      transform: rotate(-1.2deg);
+      border: 2px solid var(--ink);
+      box-shadow: 3px 3px 0 var(--ink);
+      letter-spacing: -0.5px;
     }
 
-    .hero-bullets {
+    .action-lead-text {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      margin-bottom: 4px;
+      font-family: var(--font-mono);
+    }
+
+    .hero-features {
       display: flex;
       flex-direction: column;
       gap: 10px;
+      margin-top: 6px;
     }
 
-    .hero-bullet {
+    .feature-item {
       display: flex;
       align-items: center;
       gap: 12px;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       color: var(--ink-soft);
-      font-weight: 500;
+      font-weight: 600;
     }
 
-    .hero-bullet-icon {
-      width: 28px; height: 28px;
+    .feature-icon-box {
+      width: 28px;
+      height: 28px;
       background: var(--ink);
       color: var(--yellow);
       border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       flex-shrink: 0;
+      box-shadow: 1px 1px 0 #000;
     }
 
-    .hero-buttons {
+    .hero-cta-group {
       display: flex;
       gap: 12px;
+      align-items: center;
       flex-wrap: wrap;
+      margin-top: 8px;
     }
 
-    .btn-hero-primary {
+    .btn-hero-main {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
       background: var(--ink);
       color: var(--yellow);
       border: 2px solid var(--ink);
-      padding: 14px 28px;
-      font-family: var(--font-sans);
-      font-weight: 700;
-      font-size: 0.9rem;
-      border-radius: 8px;
-      cursor: pointer;
+      padding: 13px 26px;
+      font-size: 0.92rem;
+      font-weight: 800;
       text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
+      border-radius: 8px;
+      box-shadow: 3px 3px 0 var(--ink);
       transition: all 0.18s;
       letter-spacing: 0.3px;
     }
 
-    .btn-hero-primary:hover {
+    .btn-hero-main:hover {
       background: var(--yellow);
       color: var(--ink);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 var(--ink);
     }
 
-    .btn-hero-secondary {
-      background: transparent;
-      color: var(--ink);
-      border: 2px solid var(--ink);
-      padding: 14px 24px;
-      font-family: var(--font-sans);
-      font-weight: 600;
-      font-size: 0.9rem;
-      border-radius: 8px;
-      cursor: pointer;
-      text-decoration: none;
+    .btn-hero-ghost {
       display: inline-flex;
       align-items: center;
       gap: 8px;
+      background: transparent;
+      color: var(--ink);
+      border: 2px solid var(--ink);
+      padding: 13px 22px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-decoration: none;
+      border-radius: 8px;
       transition: all 0.18s;
     }
 
-    .btn-hero-secondary:hover {
+    .btn-hero-ghost:hover {
       background: var(--ink);
       color: var(--white);
       transform: translateY(-2px);
     }
 
-    /* ─── HERO RIGHT: RECEIPT MOCKUP ─────────────────────── */
-    .hero-right {
-      position: relative;
+    /* Stickers bar */
+    .stickers-bar {
       display: flex;
       align-items: center;
-      justify-content: center;
-    }
-
-    /* Crayon doodle outlines (yellow + black) */
-    .doodle-camera {
-      position: absolute;
-      top: -40px;
-      right: -30px;
-      width: 120px;
-      height: 90px;
-      opacity: 0.18;
-    }
-
-    .doodle-receipt {
-      position: absolute;
-      bottom: -30px;
-      left: -40px;
-      width: 80px;
-      height: 120px;
-      opacity: 0.14;
-    }
-
-    /* The 3D receipt printer mockup built from divs */
-    .printer-mockup {
-      position: relative;
-      width: 340px;
-      filter: drop-shadow(0 20px 40px rgba(0,0,0,0.22));
-    }
-
-    .printer-body {
-      background: linear-gradient(160deg, #2a2a2a 0%, #111 60%, #1c1c1c 100%);
-      border-radius: 18px 18px 8px 8px;
-      padding: 28px 24px 16px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .printer-body::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
-    }
-
-    .printer-slot {
-      background: #0a0a0a;
-      height: 8px;
-      border-radius: 4px;
-      margin: 10px 16px 0;
-      position: relative;
-      overflow: hidden;
-      box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
-    }
-
-    .printer-slot::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, transparent 0%, rgba(255,215,74,0.15) 50%, transparent 100%);
-      animation: scan 3s ease-in-out infinite;
-    }
-
-    @keyframes scan {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
-    }
-
-    .printer-indicator {
-      width: 8px; height: 8px;
-      background: #22c55e;
-      border-radius: 50%;
-      position: absolute;
-      top: 18px; right: 22px;
-      box-shadow: 0 0 8px #22c55e;
-      animation: blink 2s ease-in-out infinite;
-    }
-
-    .printer-label {
-      font-family: var(--font-mono);
-      font-size: 0.55rem;
-      letter-spacing: 2px;
-      color: #444;
-      text-align: center;
-      padding: 10px 0 4px;
-      text-transform: uppercase;
-    }
-
-    /* Emerging receipt */
-    .receipt-tail {
-      background: #fefcf9;
-      border-left: 1px solid #ddd;
-      border-right: 1px solid #ddd;
-      width: 240px;
-      margin: 0 auto;
-      padding: 14px 16px;
-      position: relative;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-      font-family: var(--font-pixel);
-    }
-
-    .receipt-tail::after {
-      content: '';
-      display: block;
-      height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-top: 12px solid #fefcf9;
-      position: absolute;
-      bottom: -12px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
-
-    .receipt-photo-strip {
-      width: 100%;
-      aspect-ratio: 3/2;
-      background: linear-gradient(135deg, #1a1a1a 0%, #3d3d3d 40%, #1a1a1a 100%);
-      margin-bottom: 10px;
-      border-radius: 2px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Dithered photo simulation */
-    .receipt-photo-strip::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        radial-gradient(circle, #fff 1px, transparent 1px),
-        radial-gradient(circle, #fff 0.5px, transparent 0.5px);
-      background-size: 4px 4px, 8px 8px;
-      background-position: 0 0, 2px 2px;
-      opacity: 0.3;
-    }
-
-    .receipt-photo-strip::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at 40% 35%, rgba(255,255,255,0.4) 0%, transparent 60%);
-    }
-
-    .receipt-mini-lines {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .receipt-line {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: #1a1a1a;
-      letter-spacing: 0.5px;
-    }
-
-    .receipt-divider {
-      height: 1px;
-      border-top: 1px dashed #ccc;
-      margin: 6px 0;
-    }
-
-    .receipt-qr-mini {
-      width: 44px;
-      height: 44px;
-      background: #000;
-      border-radius: 2px;
-      margin: 8px auto 0;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .receipt-qr-mini::before {
-      content: '';
-      position: absolute;
-      top: 4px; left: 4px;
-      width: 14px; height: 14px;
-      border: 3px solid #fff;
-    }
-
-    .receipt-qr-mini::after {
-      content: '';
-      position: absolute;
-      top: 4px; right: 4px;
-      width: 14px; height: 14px;
-      border: 3px solid #fff;
-    }
-
-    /* ─── STICKERS ROW ───────────────────────────────────── */
-    .stickers-section {
-      position: relative;
-      z-index: 2;
-      margin-top: 40px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
+      gap: 10px;
       flex-wrap: wrap;
+      margin-top: 14px;
+      padding-top: 18px;
+      border-top: 1px dashed #d0cbbf;
     }
 
-    .sticker {
+    .diecut-sticker {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
+      gap: 6px;
       background: var(--white);
-      border: 1.5px solid var(--ink);
-      border-radius: 100px;
-      padding: 7px 16px;
-      font-family: var(--font-mono);
-      font-size: 0.7rem;
-      font-weight: 700;
       color: var(--ink);
-      letter-spacing: 0.5px;
-      position: relative;
+      border: 1.5px solid var(--ink);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.4px;
       box-shadow: 2px 2px 0 var(--ink);
-      transition: all 0.15s;
+      transition: all 0.18s var(--ease-spring);
       cursor: default;
-      white-space: nowrap;
+      user-select: none;
     }
 
-    .sticker:hover {
-      transform: translateY(-2px) rotate(-1deg);
+    .diecut-sticker:hover {
+      transform: translateY(-3px) rotate(-1.5deg);
       box-shadow: 3px 5px 0 var(--ink);
     }
 
-    .sticker.yellow { background: var(--yellow); }
-    .sticker.dark { background: var(--ink); color: var(--yellow); box-shadow: 2px 2px 0 var(--yellow-dark); }
-
-    .sticker-icon { font-size: 0.9rem; }
-
-    .sticker-badge {
-      width: 80px; height: 80px;
-      background: var(--ink);
-      color: var(--yellow);
-      border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-family: var(--font-mono);
-      font-size: 0.5rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-align: center;
-      line-height: 1.3;
-      text-transform: uppercase;
-      flex-shrink: 0;
-      box-shadow: 2px 2px 0 var(--yellow-dark);
-      animation: spin-slow 20s linear infinite;
+    .diecut-sticker.yellow {
+      background: var(--yellow);
     }
 
-    @keyframes spin-slow {
+    .diecut-sticker.dark {
+      background: var(--ink);
+      color: var(--yellow);
+    }
+
+    /* Circular spinning badge from Tigran portfolio */
+    .spinning-badge {
+      width: 76px;
+      height: 76px;
+      flex-shrink: 0;
+      margin-left: auto;
+      cursor: pointer;
+      filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.4));
+      transition: transform 0.3s var(--ease-spring);
+    }
+
+    .spinning-badge:hover {
+      transform: scale(1.1);
+    }
+
+    .spin-circle-svg {
+      width: 100%;
+      height: 100%;
+      animation: spin 16s linear infinite;
+    }
+
+    @keyframes spin {
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
     }
 
-    .hero-bottom-tagline {
-      position: relative;
-      z-index: 2;
-      margin-top: 18px;
-      font-family: var(--font-sans);
-      font-size: 0.7rem;
-      letter-spacing: 3.5px;
-      text-transform: uppercase;
-      color: var(--ink-muted);
-    }
-
-    /* ─── HOW IT WORKS ───────────────────────────────────── */
-    .section {
-      background: var(--bg-chrome);
-      padding: 80px 32px;
-    }
-
-    .section-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-
-    .section-label {
-      font-family: var(--font-mono);
-      font-size: 0.65rem;
+    .hero-footer-note {
+      font-size: 0.68rem;
+      font-weight: 700;
       letter-spacing: 3px;
       text-transform: uppercase;
-      color: var(--yellow);
+      color: var(--ink-muted);
+      margin-top: 6px;
+      font-family: var(--font-mono);
+    }
+
+    /* Right Visual: 3D-styled Printer Mockup with Receipt Tail */
+    .hero-visual {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Background Crayon Doodle SVG */
+    .crayon-doodle {
+      position: absolute;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .doodle-cam {
+      top: -30px;
+      right: -20px;
+      width: 130px;
+      height: 95px;
+      opacity: 0.3;
+    }
+
+    .printer-stage {
+      position: relative;
+      z-index: 2;
+      width: 330px;
+      filter: drop-shadow(0 20px 45px rgba(0,0,0,0.3));
+    }
+
+    /* Antique thermal receipt printer body */
+    .printer-box {
+      background: linear-gradient(150deg, #2c2c34 0%, #17171c 55%, #101013 100%);
+      border-radius: 16px 16px 8px 8px;
+      border: 2px solid #363642;
+      padding: 22px 20px 14px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(255,255,255,0.08);
+    }
+
+    .printer-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 12px;
     }
 
-    .section-title {
-      font-size: clamp(1.6rem, 3vw, 2.4rem);
-      font-weight: 800;
+    .printer-logo {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      letter-spacing: 2px;
+      font-weight: 700;
+      color: #999;
+    }
+
+    .printer-led {
+      width: 8px;
+      height: 8px;
+      background: #34d399;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #34d399;
+      animation: pulse 1.5s infinite;
+    }
+
+    .printer-roller-slot {
+      height: 10px;
+      background: #08080a;
+      border-radius: 5px;
+      margin-bottom: 2px;
+      box-shadow: inset 0 3px 5px rgba(0,0,0,0.9);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .printer-roller-slot::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(240,216,74,0.3), transparent);
+      animation: scanRoll 2.6s infinite ease-in-out;
+    }
+
+    @keyframes scanRoll {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    /* Receipt emerging */
+    .receipt-printout {
+      background: #fff;
+      color: #111;
+      width: 250px;
+      margin: 0 auto;
+      padding: 14px 16px 16px;
+      font-family: var(--font-pixel);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+      border-left: 1px solid #ddd;
+      border-right: 1px solid #ddd;
+      position: relative;
+    }
+
+    /* Masking tape on top of receipt from Tigran portfolio */
+    .receipt-tape {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-1deg);
+      width: 90px;
+      height: 24px;
+      background: var(--tape);
+      clip-path: polygon(2% 0, 98% 0, 100% 12%, 97.5% 26%, 100% 41%, 97.5% 57%, 100% 73%, 97.5% 88%, 99% 100%, 1% 100%, 2.5% 86%, 0 71%, 2.5% 55%, 0 40%, 2.5% 25%, 0 11%);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+      z-index: 4;
+    }
+
+    .receipt-header-txt {
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.2;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .receipt-photo-box {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: #111;
+      border: 1.5px solid #000;
+      margin-bottom: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .receipt-photo-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: 
+        radial-gradient(circle, #fff 1px, transparent 1px),
+        radial-gradient(circle, #fff 0.5px, transparent 0.5px);
+      background-size: 3.5px 3.5px, 7px 7px;
+      background-position: 0 0, 2px 2px;
+      opacity: 0.45;
+    }
+
+    .receipt-photo-box::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 40%, rgba(255,255,255,0.4) 0%, transparent 60%);
+    }
+
+    .receipt-table {
+      font-size: 9px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      border-top: 1px dashed #999;
+      border-bottom: 1px dashed #999;
+      padding: 6px 0;
+      margin: 6px 0;
+    }
+
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .receipt-qr-center {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin-top: 8px;
+    }
+
+    .receipt-qr-preview {
+      width: 64px;
+      height: 64px;
+      image-rendering: pixelated;
+    }
+
+    .receipt-cut-edge {
+      display: block;
+      width: calc(100% + 32px);
+      margin: 10px -16px -17px;
+    }
+
+    /* ─── TAPE BANDS (MARQUEE) ───────────────────────────── */
+    .marquee-bands {
+      position: relative;
+      z-index: 10;
+      height: 140px;
+      margin-top: -30px;
+      margin-bottom: 30px;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .band {
+      position: absolute;
+      top: 50%;
+      left: -5vw;
+      width: 110vw;
+      padding: 10px 0;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+    }
+
+    .band-yellow {
+      background: var(--yellow);
+      color: var(--ink);
+      transform: translateY(-50%) rotate(-2.8deg);
+      z-index: 2;
+    }
+
+    .band-paper {
+      background: var(--bg-paper);
+      color: var(--ink);
+      transform: translateY(-50%) rotate(2deg);
+      z-index: 1;
+      border-top: 1px solid #d4d0c8;
+      border-bottom: 1px solid #d4d0c8;
+    }
+
+    .band-track {
+      display: flex;
+      align-items: center;
+      width: max-content;
+      font-weight: 900;
+      font-size: 1.1rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      animation: scrollMarquee 38s linear infinite;
+    }
+
+    .band-paper .band-track {
+      animation-duration: 48s;
+      animation-direction: reverse;
+    }
+
+    .band-item {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding-right: 20px;
+    }
+
+    @keyframes scrollMarquee {
+      to { transform: translateX(-50%); }
+    }
+
+    /* ─── HOW IT WORKS SECTION ───────────────────────────── */
+    .section-dark {
+      padding: 90px 32px;
+      background: var(--bg-chrome);
+    }
+
+    .section-wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .sec-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--yellow);
+      margin-bottom: 8px;
+    }
+
+    .sec-headline {
+      font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+      font-weight: 900;
+      letter-spacing: -0.5px;
       color: var(--white);
-      line-height: 1.15;
       margin-bottom: 48px;
     }
 
@@ -670,532 +809,922 @@
     }
 
     .step-card {
-      background: #1e1e1e;
-      border: 1px solid #2a2a2a;
-      border-radius: 12px;
-      padding: 28px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-dark);
+      border-radius: 14px;
+      padding: 32px 26px;
       position: relative;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: all 0.25s var(--ease-spring);
     }
 
     .step-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+      transform: translateY(-6px);
+      border-color: #3e3e4c;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.4);
     }
 
-    .step-num {
+    .step-num-big {
       font-family: var(--font-pixel);
-      font-size: 3.5rem;
-      color: #2a2a2a;
+      font-size: 4rem;
       line-height: 1;
+      color: #2b2b36;
       margin-bottom: 12px;
     }
 
-    .step-title {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--white);
-      margin-bottom: 8px;
-    }
-
-    .step-desc {
-      font-size: 0.83rem;
-      color: #666;
-      line-height: 1.55;
-    }
-
-    .step-card-accent {
+    .step-badge-icon {
       position: absolute;
-      top: 20px; right: 20px;
-      width: 36px; height: 36px;
+      top: 24px;
+      right: 24px;
+      width: 40px;
+      height: 40px;
       background: var(--yellow);
-      border-radius: 8px;
+      color: var(--ink);
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
+      box-shadow: 2px 2px 0 #000;
+    }
+
+    .step-name {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 10px;
+    }
+
+    .step-text {
+      font-size: 0.86rem;
+      color: #92929e;
+      line-height: 1.6;
     }
 
     /* ─── EXAMPLES / GALLERY ─────────────────────────────── */
-    .gallery-section {
+    .section-paper {
       background: var(--bg-paper);
-      padding: 80px 32px;
+      color: var(--ink);
+      padding: 90px 32px;
       position: relative;
-      overflow: hidden;
     }
 
-    .gallery-section::before {
+    .section-paper::before {
       content: '';
       position: absolute;
       inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
       pointer-events: none;
     }
-
-    .gallery-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      position: relative;
-    }
-
-    .gallery-section .section-label { color: var(--ink-muted); }
-    .gallery-section .section-title { color: var(--ink); }
 
     .gallery-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
+      gap: 28px;
     }
 
-    .gallery-card {
+    .artifact-card {
       background: var(--white);
-      border: 1px solid #d4d0c8;
-      border-radius: 8px;
+      border: 1.5px solid #dcd7cc;
+      border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-      transition: all 0.2s;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      transition: all 0.25s var(--ease-spring);
+      position: relative;
     }
 
-    .gallery-card:hover {
-      transform: translateY(-4px) rotate(0.3deg);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+    .artifact-card:hover {
+      transform: translateY(-6px) rotate(0.4deg);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.15);
     }
 
-    .gallery-card-preview {
-      aspect-ratio: 2/3;
-      background: #f0ede5;
+    /* Tape on top of card */
+    .card-tape {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%) rotate(-1.5deg);
+      width: 76px;
+      height: 22px;
+      background: var(--tape);
+      clip-path: polygon(2% 0, 98% 0, 100% 12%, 97.5% 26%, 100% 41%, 97.5% 57%, 100% 73%, 97.5% 88%, 99% 100%, 1% 100%, 2.5% 86%, 0 71%, 2.5% 55%, 0 40%, 2.5% 25%, 0 11%);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      z-index: 5;
+    }
+
+    .artifact-preview {
+      aspect-ratio: 4/5;
+      background: #eeebe3;
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
+      padding: 24px;
       position: relative;
+      overflow: hidden;
     }
 
-    .gallery-receipt-preview {
-      width: 75%;
+    .artifact-receipt-mini {
+      width: 82%;
       background: #fff;
-      padding: 10px 8px;
+      padding: 12px 10px;
       font-family: var(--font-pixel);
-      font-size: 7px;
-      line-height: 1.5;
-      color: #111;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      font-size: 8px;
+      line-height: 1.4;
+      color: #000;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.12);
     }
 
-    .gallery-polaroid-preview {
-      width: 80%;
+    .artifact-polaroid-mini {
+      width: 84%;
       background: #faf7f2;
-      padding: 8px 8px 24px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      padding: 10px 10px 28px;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.14);
+      position: relative;
     }
 
-    .gallery-polaroid-photo {
-      width: 100%;
+    .polaroid-screen-mini {
       aspect-ratio: 1;
-      background: linear-gradient(135deg, #c9a870 0%, #8b6545 50%, #4a3020 100%);
+      background: linear-gradient(135deg, #a27b4f, #6d4b2f, #332115);
       position: relative;
       overflow: hidden;
+      border: 1px solid #111;
     }
 
-    .gallery-polaroid-photo::after {
+    .polaroid-screen-mini::after {
       content: '';
       position: absolute;
       inset: 0;
-      background-image:
-        radial-gradient(circle, rgba(0,0,0,0.4) 1px, transparent 1px);
+      background-image: radial-gradient(circle, rgba(0,0,0,0.4) 1px, transparent 1px);
       background-size: 3px 3px;
-      mix-blend-mode: multiply;
     }
 
-    .gallery-card-tag {
-      padding: 12px 14px;
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: var(--ink-soft);
-      background: var(--white);
-      letter-spacing: 0.3px;
+    .polaroid-lcd-mini {
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      font-family: var(--font-pixel);
+      font-size: 11px;
+      color: #ff9922;
+      text-shadow: 0 0 6px rgba(255,153,34,0.85);
+      z-index: 2;
     }
 
-    /* ─── CTA SECTION ────────────────────────────────────── */
-    .cta-section {
-      background: var(--ink);
-      padding: 80px 32px;
+    .polaroid-caption-mini {
+      font-family: var(--font-hand);
+      font-size: 13px;
+      color: #222;
       text-align: center;
+      margin-top: 8px;
+    }
+
+    .artifact-info {
+      padding: 16px 20px;
+      background: var(--white);
+      border-top: 1px solid #e2ddd4;
+    }
+
+    .artifact-title {
+      font-size: 0.88rem;
+      font-weight: 800;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .artifact-desc {
+      font-size: 0.76rem;
+      color: var(--ink-muted);
+    }
+
+    /* ─── CONTACTS & AUTHOR SECTION ──────────────────────── */
+    .section-contacts {
+      background: var(--bg-chrome);
+      padding: 100px 32px 80px;
+      position: relative;
+      border-top: 1px solid var(--border-dark);
+    }
+
+    .contacts-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border-dark);
+      border-radius: 20px;
+      padding: 56px 64px;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 48px;
+      align-items: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
       position: relative;
       overflow: hidden;
     }
 
-    .cta-section::before {
+    .contacts-card::before {
       content: '';
       position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at center, rgba(240,216,74,0.08) 0%, transparent 70%);
+      top: -100px;
+      right: -100px;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, var(--yellow-glow) 0%, transparent 70%);
+      pointer-events: none;
     }
 
-    .cta-inner {
-      max-width: 680px;
-      margin: 0 auto;
-      position: relative;
-    }
-
-    .cta-title {
-      font-size: clamp(2rem, 4vw, 3.2rem);
+    .contacts-title {
+      font-size: clamp(2rem, 3.8vw, 3.2rem);
       font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 14px;
       color: var(--white);
-      line-height: 1.15;
-      margin-bottom: 16px;
     }
 
-    .cta-title em {
+    .contacts-title em {
       font-style: normal;
       color: var(--yellow);
     }
 
-    .cta-sub {
-      font-size: 1rem;
-      color: #888;
-      margin-bottom: 36px;
-      line-height: 1.5;
+    .contacts-lead {
+      font-size: 0.96rem;
+      color: #9c9ca8;
+      line-height: 1.6;
+      margin-bottom: 28px;
+      max-width: 480px;
     }
 
-    .cta-btn {
+    .contacts-actions {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-instagram {
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      background: var(--yellow);
-      color: var(--ink);
-      padding: 16px 36px;
-      border-radius: 10px;
+      background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+      color: #fff;
+      padding: 13px 26px;
+      border-radius: 999px;
       font-weight: 800;
-      font-size: 1rem;
+      font-size: 0.9rem;
       text-decoration: none;
-      transition: all 0.2s;
-      box-shadow: 0 4px 24px rgba(240,216,74,0.3);
+      box-shadow: 0 8px 24px rgba(220, 39, 67, 0.35);
+      transition: all 0.2s var(--ease-spring);
     }
 
-    .cta-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 36px rgba(240,216,74,0.5);
+    .btn-instagram:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 30px rgba(220, 39, 67, 0.5);
+    }
+
+    .author-badge-card {
+      background: #22222a;
+      border: 1px solid #363644;
+      border-radius: 16px;
+      padding: 30px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      position: relative;
+    }
+
+    .author-tape-pin {
+      position: absolute;
+      top: -12px;
+      right: 28px;
+      width: 70px;
+      height: 24px;
+      background: var(--tape);
+      clip-path: polygon(2% 0, 98% 0, 100% 12%, 97.5% 26%, 100% 41%, 97.5% 57%, 100% 73%, 97.5% 88%, 99% 100%, 1% 100%, 2.5% 86%, 0 71%, 2.5% 55%, 0 40%, 2.5% 25%, 0 11%);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      transform: rotate(4deg);
+    }
+
+    .author-avatar-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .author-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--yellow);
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1.4rem;
+      border: 2px solid var(--white);
+    }
+
+    .author-name {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--white);
+    }
+
+    .author-role {
+      font-size: 0.72rem;
+      color: var(--yellow);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+    }
+
+    .author-bio {
+      font-size: 0.82rem;
+      color: #9999a6;
+      line-height: 1.5;
     }
 
     /* ─── FOOTER ─────────────────────────────────────────── */
     footer {
-      background: #111;
-      padding: 24px 32px;
+      background: #0e0e11;
+      padding: 24px 36px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-top: 1px solid #1e1e1e;
+      border-top: 1px solid var(--border-dark);
+      font-size: 0.75rem;
+      color: #666674;
     }
 
-    .footer-logo {
-      font-weight: 800;
-      font-size: 0.9rem;
-      color: #fff;
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
 
-    .footer-logo span { color: var(--yellow); }
+    .footer-left b {
+      color: var(--white);
+    }
 
-    .footer-link {
-      font-size: 0.72rem;
-      color: #555;
+    .footer-left span {
+      color: var(--yellow);
+    }
+
+    .footer-links {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .footer-links a {
+      color: #888898;
       text-decoration: none;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      transition: color 0.15s;
+      transition: color 0.18s;
     }
 
-    .footer-link:hover { color: var(--yellow); }
-
-    /* ─── HAND-DRAWN DOODLES (SVG inline) ───────────────── */
-    .doodle-svg {
-      position: absolute;
-      pointer-events: none;
-      overflow: visible;
+    .footer-links a:hover {
+      color: var(--yellow);
     }
 
     /* ─── RESPONSIVE ─────────────────────────────────────── */
-    @media (max-width: 900px) {
-      .hero-inner { grid-template-columns: 1fr; }
-      .hero-right { display: none; }
-      .hero-frame { padding: 40px 28px 36px; }
+    @media (max-width: 980px) {
+      nav { padding: 12px 20px; }
+      .nav-center { display: none; }
+      .hero-layout { grid-template-columns: 1fr; }
+      .hero-visual { display: none; }
+      .hero-frame { padding: 36px 24px; }
       .steps-grid { grid-template-columns: 1fr; }
-      .gallery-grid { grid-template-columns: 1fr 1fr; }
-      nav { padding: 12px 16px; }
-      .nav-links { display: none; }
-    }
-
-    @media (max-width: 560px) {
       .gallery-grid { grid-template-columns: 1fr; }
+      .contacts-card { grid-template-columns: 1fr; padding: 36px 24px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ─── NAV ─────────────────────────────────────────────── -->
+  <!-- ─── NAVIGATION ─────────────────────────────────────── -->
   <nav>
-    <div class="nav-logo">
-      <div class="nav-logo-main">RETRO<span>CHECK</span></div>
-      <div class="nav-logo-sub">PHOTO TO RECEIPT / RETRO</div>
-    </div>
-    <ul class="nav-links">
-      <li><a href="#">ГЛАВНАЯ</a></li>
-      <li><a href="#how">КАК ЭТО РАБОТАЕТ</a></li>
-      <li><a href="#examples">ПРИМЕРЫ</a></li>
-      <li><a href="#cta">ЦЕНЫ</a></li>
-      <li><a href="#cta">КОНТАКТЫ</a></li>
-      <li><a href="studio.html" class="nav-cta">СОЗДАТЬ ЧЕК / РЕТРО →</a></li>
+    <a href="#" class="nav-brand">
+      <div class="nav-logo-text">RETRO<span>CHECK</span></div>
+      <div class="nav-tagline" data-i18n="tagline">PHOTO TO RECEIPT / RETRO</div>
+    </a>
+
+    <ul class="nav-center">
+      <li><a href="#" class="nav-link" data-i18n="nav_home">HOME</a></li>
+      <li><a href="#how" class="nav-link" data-i18n="nav_how">HOW IT WORKS</a></li>
+      <li><a href="#gallery" class="nav-link" data-i18n="nav_gallery">EXAMPLES</a></li>
+      <li><a href="#contacts" class="nav-link" data-i18n="nav_contacts">CONTACTS</a></li>
     </ul>
+
+    <div class="nav-right">
+      <!-- 3-Language switcher: EN primary, then HY, then RU -->
+      <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" data-lang="hy" onclick="setLang('hy')">ՀԱՅ</button>
+        <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">РУ</button>
+      </div>
+
+      <a href="studio.html" class="nav-cta-btn" data-i18n="nav_cta">
+        <span>⚡</span> CREATE RETRO / RECEIPT
+      </a>
+    </div>
   </nav>
 
-  <!-- ─── HERO ──────────────────────────────────────────────── -->
+  <!-- ─── HERO ───────────────────────────────────────────── -->
   <section class="hero">
     <div class="hero-frame">
 
-      <!-- corner doodles -->
-      <svg class="doodle-svg" style="top:60px;right:60px;width:110px;height:90px;opacity:0.22;" viewBox="0 0 110 90" fill="none">
-        <!-- camera body crayon outline -->
-        <path d="M10 28 Q10 20 18 20 L42 20 L46 12 L64 12 L68 20 L92 20 Q100 20 100 28 L100 72 Q100 80 92 80 L18 80 Q10 80 10 72 Z" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round" fill="none" style="stroke: var(--yellow);"/>
-        <circle cx="55" cy="50" r="18" stroke="#1a1a1a" stroke-width="4" fill="none" style="stroke: var(--yellow);"/>
-        <circle cx="55" cy="50" r="9" stroke="#1a1a1a" stroke-width="3" fill="none" style="stroke: var(--yellow);"/>
-        <circle cx="84" cy="30" r="4" fill="none" stroke="#1a1a1a" stroke-width="2.5" style="stroke: var(--yellow);"/>
+      <!-- Hand-drawn crayon camera doodle -->
+      <svg class="crayon-doodle doodle-cam" viewBox="0 0 110 85" fill="none">
+        <path d="M12 24 Q12 16 20 16 L42 16 L46 8 L64 8 L68 16 L90 16 Q98 16 98 24 L98 68 Q98 76 90 76 L20 76 Q12 76 12 68 Z" stroke="#161616" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="55" cy="46" r="18" stroke="#f0d84a" stroke-width="4.5"/>
+        <circle cx="55" cy="46" r="9" stroke="#161616" stroke-width="3"/>
+        <circle cx="82" cy="26" r="4" fill="#f0d84a"/>
       </svg>
 
-      <svg class="doodle-svg" style="bottom:72px;left:48px;width:60px;height:110px;opacity:0.18;" viewBox="0 0 60 110" fill="none">
-        <!-- receipt outline -->
-        <path d="M8 8 H52 V90 L46 84 L40 90 L34 84 L28 90 L22 84 L16 90 L10 84 L4 90 V8 H8" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round" fill="none"/>
-        <line x1="14" y1="28" x2="46" y2="28" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
-        <line x1="14" y1="40" x2="46" y2="40" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
-        <line x1="14" y1="52" x2="36" y2="52" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
-      </svg>
+      <div class="hero-layout">
 
-      <div class="hero-inner">
-
-        <!-- LEFT COPY -->
-        <div class="hero-left">
-          <div class="hero-eyebrow">
-            <span class="hero-eyebrow-dot"></span>
-            СЕРВИС ТРАНСФОРМАЦИИ ФОТО
+        <!-- Copy -->
+        <div class="hero-copy">
+          <div class="hero-eyebrow-pill">
+            <span class="eyebrow-dot"></span>
+            <span data-i18n="eyebrow">ANALOG VISUAL ARCHIVE</span>
           </div>
 
-          <div class="hero-subtitle-big">ТВОИ ФОТО. В РЕТРО. НА ЧЕКЕ.</div>
+          <div class="hero-subhead" data-i18n="subhead">YOUR PHOTOS. RETRO VIBE. THERMAL RECEIPT.</div>
 
-          <div class="hero-title">
-            <div class="hero-title-line1">СЕРВИС</div>
-            <div class="hero-title-line1" style="padding-top:8px;">ТРАНСФОРМАЦИИ</div>
-            <div class="hero-title-line2" style="margin-top:12px;"><em>RETRO</em>&nbsp;CHECK</div>
+          <div class="hero-main-title">
+            <div class="title-line-underlined" data-i18n="title_p1">TRANSFORMATION STUDIO</div>
+            <div class="title-brand-row"><em>RETRO</em> CHECK</div>
           </div>
 
-          <div>
-            <div class="hero-action-word">
-              <span style="font-size:1rem;font-weight:600;letter-spacing:2px;color:var(--ink-muted);text-transform:uppercase;">(что мы делаем)</span><br>
-              <span class="yellow-bg">ПРЕВРАЩАЕМ</span>
+          <div class="hero-action-banner">
+            <div class="action-lead-text" data-i18n="action_lead">(WHAT WE DO)</div>
+            <div class="action-badge" data-i18n="action_badge">WE TRANSFORM</div>
+          </div>
+
+          <div class="hero-features">
+            <div class="feature-item">
+              <div class="feature-icon-box">🧾</div>
+              <span data-i18n="f1">Your photo into a 1-bit dithered thermal print receipt with official QR &amp; torn edges</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box">📷</div>
+              <span data-i18n="f2">Your photo into an authentic 90s Polaroid snap with vintage tone curves &amp; LCD date</span>
+            </div>
+            <div class="feature-item">
+              <div class="feature-icon-box">⚡</div>
+              <span data-i18n="f3">Client-side processing directly in your browser — instant, private, no servers</span>
             </div>
           </div>
 
-          <div class="hero-bullets">
-            <div class="hero-bullet">
-              <div class="hero-bullet-icon">🧾</div>
-              <span>Твоё фото — в термо-чек с 1-bit дизерингом, QR-кодом и перфорированным краем</span>
-            </div>
-            <div class="hero-bullet">
-              <div class="hero-bullet-icon">📷</div>
-              <span>Твоё фото — в полароид 90-х с виньеткой, засветкой плёнки и LCD-датой</span>
-            </div>
-            <div class="hero-bullet">
-              <div class="hero-bullet-icon">⚡</div>
-              <span>Мгновенно, прямо в браузере — без регистрации и установки</span>
+          <div class="hero-cta-group">
+            <a href="studio.html" class="btn-hero-main" data-i18n="btn_studio">
+              <span>⚡</span> OPEN STUDIO
+            </a>
+            <a href="#gallery" class="btn-hero-ghost" data-i18n="btn_examples">
+              VIEW EXAMPLES ↓
+            </a>
+          </div>
+
+          <!-- Stickers row with rotating circular badge -->
+          <div class="stickers-bar">
+            <div class="diecut-sticker yellow"><span>📷</span>#RETRO_FILTERS</div>
+            <div class="diecut-sticker"><span>🧾</span>#THERMAL_PRINT</div>
+            <div class="diecut-sticker dark"><span>📸</span>#PHOTO_RECEIPT</div>
+            <div class="diecut-sticker"><span>📰</span>#OLD_NEWSPAPER</div>
+            <div class="diecut-sticker"><span>⬛</span>#1BIT_DITHER</div>
+
+            <!-- Tigran portfolio style rotating badge -->
+            <div class="spinning-badge" title="RETRO CHECK EST. 2024">
+              <svg class="spin-circle-svg" viewBox="0 0 100 100">
+                <path id="circlePath" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0" fill="none"/>
+                <circle cx="50" cy="50" r="46" fill="#161616" stroke="#f0d84a" stroke-width="2"/>
+                <text font-family="'Space Mono', monospace" font-size="8.8" font-weight="700" fill="#f0d84a">
+                  <textPath href="#circlePath" startOffset="0%">★ RETRO CHECK ★ PAPER ARCHIVE ★ EST 2024 </textPath>
+                </text>
+                <circle cx="50" cy="50" r="14" fill="#f0d84a"/>
+                <polygon points="50,42 52.5,47.5 58,48 54,52 55,57.5 50,54.5 45,57.5 46,52 42,48 47.5,47.5" fill="#161616"/>
+              </svg>
             </div>
           </div>
 
-          <div class="hero-buttons">
-            <a href="studio.html" class="btn-hero-primary">⚡ Создать сейчас</a>
-            <a href="#examples" class="btn-hero-secondary">Посмотреть примеры →</a>
-          </div>
-
-          <!-- STICKERS -->
-          <div class="stickers-section">
-            <div class="sticker yellow"><span class="sticker-icon">📷</span>#РЕТРО-ФИЛЬТРЫ</div>
-            <div class="sticker"><span class="sticker-icon">🧾</span>#ТЕРМО-ПЕЧАТЬ</div>
-            <div class="sticker dark"><span class="sticker-icon">📸</span>#ФОТО-ЧЕКИ</div>
-            <div class="sticker"><span class="sticker-icon">📰</span>#СТАРЫЕ_ГАЗЕТЫ</div>
-            <div class="sticker"><span class="sticker-icon">⬛</span>#ЧБ_СНИМКИ</div>
-            <div class="sticker-badge">
-              ★<br>RETRO<br>CHECK<br>EST.<br>2024<br>★
-            </div>
-          </div>
-
-          <div class="hero-bottom-tagline">ПОД КРЕАТИВНЫЕ И ЭКСПЕРИМЕНТАЛЬНЫЕ ЗАДАЧИ</div>
+          <div class="hero-footer-note" data-i18n="tagline_bottom">FOR CREATIVE &amp; EXPERIMENTAL PURPOSES</div>
         </div>
 
-        <!-- RIGHT MOCKUP -->
-        <div class="hero-right">
-          <div class="printer-mockup">
+        <!-- Right Visual Mockup: Antique Thermal Printer + Emerged Photo Receipt -->
+        <div class="hero-visual">
+          <div class="printer-stage">
 
-            <!-- Printer body -->
-            <div class="printer-body">
-              <div class="printer-indicator"></div>
-              <div style="display:flex;justify-content:center;gap:10px;margin-bottom:8px;">
-                <div style="width:44px;height:14px;background:#1a1a1a;border-radius:3px;"></div>
-                <div style="width:14px;height:14px;background:#1a1a1a;border-radius:3px;"></div>
+            <!-- 3D Printer Body -->
+            <div class="printer-box">
+              <div class="printer-top-bar">
+                <div class="printer-logo">RETRO CHECK // MODEL-58</div>
+                <div class="printer-led"></div>
               </div>
-              <div style="height:60px;background:linear-gradient(180deg,#0a0a0a,#111);border-radius:8px;display:flex;align-items:center;justify-content:center;margin:0 0 8px;">
-                <div style="width:70%;height:3px;background:linear-gradient(90deg,transparent,#333,transparent);border-radius:2px;"></div>
+
+              <div style="height:44px;background:#0d0d10;border-radius:6px;display:flex;align-items:center;justify-content:center;margin-bottom:8px;border:1px solid #202026;">
+                <div style="width:65%;height:2px;background:linear-gradient(90deg,transparent,#444,transparent);"></div>
               </div>
-              <div class="printer-slot"></div>
-              <div class="printer-label">RETRO CHECK THERMAL</div>
+
+              <div class="printer-roller-slot"></div>
             </div>
 
-            <!-- Receipt emerging from printer -->
-            <div class="receipt-tail">
-              <div style="font-size:7px;text-align:center;letter-spacing:1px;margin-bottom:8px;font-family:var(--font-pixel);">
-                ★ TIGRAN SOLOMON'S PAPER ARCHIVE ★
-              </div>
-              <div class="receipt-photo-strip"></div>
-              <div class="receipt-divider"></div>
-              <div class="receipt-mini-lines">
-                <div class="receipt-line"><span>01 SILVER HALIDE</span><span>OK</span></div>
-                <div class="receipt-line"><span>01 THERMAL EMULSION</span><span>OK</span></div>
-                <div class="receipt-line"><span>01 LATENT PRINT</span><span>OK</span></div>
-              </div>
-              <div class="receipt-divider"></div>
-              <div style="font-size:7px;text-align:center;font-family:var(--font-pixel);letter-spacing:0.5px;">
-                ARC-1792565-F4B2<br>
-                <span style="opacity:0.5;">2024-10-18 // 22:35</span>
-              </div>
-              <div class="receipt-qr-mini"></div>
-              <div style="font-size:6px;text-align:center;font-family:var(--font-pixel);margin-top:6px;opacity:0.6;letter-spacing:1px;">
-                SCAN TO ACCESS ARCHIVE
+            <!-- Receipt Printout -->
+            <div class="receipt-printout">
+              <div class="receipt-tape"></div>
+
+              <div class="receipt-header-txt">
+                * * * * * * * * * * * * *<br>
+                <b>TIGRAN SOLOMON'S PAPER ARCHIVE</b><br>
+                ANALOG MEMORY RETRIEVAL<br>
+                =========================
               </div>
 
-              <!-- zigzag torn bottom -->
-              <svg width="240" height="14" viewBox="0 0 240 14" style="display:block;margin:-1px -16px 0;width:calc(100% + 32px);">
-                <path d="M0,0 L8,12 L16,0 L24,12 L32,0 L40,12 L48,0 L56,12 L64,0 L72,12 L80,0 L88,12 L96,0 L104,12 L112,0 L120,12 L128,0 L136,12 L144,0 L152,12 L160,0 L168,12 L176,0 L184,12 L192,0 L200,12 L208,0 L216,12 L224,0 L232,12 L240,0" fill="#fefcf9" stroke="#ddd" stroke-width="1"/>
+              <div class="receipt-photo-box"></div>
+
+              <div style="text-align:center;font-size:8px;margin-bottom:4px;">
+                [ FIGURE 01: ARTIFACT PRINT ]
+              </div>
+
+              <div class="receipt-table">
+                <div class="receipt-row"><span>01 SILVER HALIDE</span><span>OK</span></div>
+                <div class="receipt-row"><span>01 THERMAL 58MM</span><span>OK</span></div>
+                <div class="receipt-row"><span>01 1-BIT DITHER</span><span>OK</span></div>
+              </div>
+
+              <div style="text-align:center;font-size:8px;line-height:1.3;">
+                INDEX NO: ARC-17925-B4C1<br>
+                TIMESTAMP: 1998-04-18 21:40
+              </div>
+
+              <div class="receipt-qr-center">
+                <img src="assets/qr_code.png" alt="QR" class="receipt-qr-preview">
+                <div style="font-size:7px;letter-spacing:1px;color:#444;">
+                  SCAN TO ACCESS ARCHIVE
+                </div>
+              </div>
+
+              <!-- Jagged cut edge -->
+              <svg class="receipt-cut-edge" viewBox="0 0 250 12" fill="#fff" stroke="#ccc" stroke-width="0.8">
+                <polygon points="0,0 10,10 20,0 30,10 40,0 50,10 60,0 70,10 80,0 90,10 100,0 110,10 120,0 130,10 140,0 150,10 160,0 170,10 180,0 190,10 200,0 210,10 220,0 230,10 240,0 250,10 250,0"/>
               </svg>
             </div>
 
           </div>
         </div>
+
       </div>
     </div>
   </section>
 
-  <!-- ─── HOW IT WORKS ──────────────────────────────────────── -->
-  <section class="section" id="how">
-    <div class="section-inner">
-      <div class="section-label">// КАК ЭТО РАБОТАЕТ</div>
-      <div class="section-title">Три шага до ретро-артефакта</div>
+  <!-- ─── MARQUEE TAPE BANDS ──────────────────────────────── -->
+  <div class="marquee-bands">
+    <div class="band band-yellow">
+      <div class="band-track">
+        <div class="band-item"><span>★ RETRO CHECK</span><span>★ THERMAL RECEIPT ARCHIVE</span><span>★ 1-BIT DITHERING</span><span>★ 90S POLAROID SNAP</span><span>★ ANALOG VISUAL ARTIFACTS</span><span>★ BY TIGRAN KHANOYAN</span></div>
+        <div class="band-item"><span>★ RETRO CHECK</span><span>★ THERMAL RECEIPT ARCHIVE</span><span>★ 1-BIT DITHERING</span><span>★ 90S POLAROID SNAP</span><span>★ ANALOG VISUAL ARTIFACTS</span><span>★ BY TIGRAN KHANOYAN</span></div>
+      </div>
+    </div>
+
+    <div class="band band-paper">
+      <div class="band-track">
+        <div class="band-item"><span>✦ INSTANT IN-BROWSER</span><span>✦ HIGH CONTRAST PRINT</span><span>✦ PERFORATED EDGES</span><span>✦ VINTAGE LIGHT LEAKS</span><span>✦ QUARTZ LCD STAMP</span><span>✦ FREE &amp; OPEN</span></div>
+        <div class="band-item"><span>✦ INSTANT IN-BROWSER</span><span>✦ HIGH CONTRAST PRINT</span><span>✦ PERFORATED EDGES</span><span>✦ VINTAGE LIGHT LEAKS</span><span>✦ QUARTZ LCD STAMP</span><span>✦ FREE &amp; OPEN</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── HOW IT WORKS ────────────────────────────────────── -->
+  <section class="section-dark" id="how">
+    <div class="section-wrap">
+      <div class="sec-eyebrow" data-i18n="how_eyebrow">// WORKFLOW</div>
+      <div class="sec-headline" data-i18n="how_title">Three steps to your retro artifact</div>
 
       <div class="steps-grid">
         <div class="step-card">
-          <div class="step-card-accent">📁</div>
-          <div class="step-num">01</div>
-          <div class="step-title">Загрузи фото</div>
-          <div class="step-desc">Перетащи или выбери любое фото — JPG, PNG или WebP. Оригинал не изменяется, мы работаем только с копией.</div>
+          <div class="step-badge-icon">📁</div>
+          <div class="step-num-big">01</div>
+          <div class="step-name" data-i18n="s1_title">Upload Photo</div>
+          <div class="step-text" data-i18n="s1_desc">Drag and drop any picture (JPG, PNG, WebP) or click "Demo". Your original photo is never modified or uploaded to any server.</div>
         </div>
+
         <div class="step-card">
-          <div class="step-card-accent">🎛️</div>
-          <div class="step-num">02</div>
-          <div class="step-title">Выбери стиль</div>
-          <div class="step-desc">Mode A — термо-чек с 1-bit дизерингом Floyd–Steinberg. Mode B — полароид 90-х с виньеткой, засветкой и LCD-датой.</div>
+          <div class="step-badge-icon">🎛️</div>
+          <div class="step-num-big">02</div>
+          <div class="step-name" data-i18n="s2_title">Choose Style</div>
+          <div class="step-text" data-i18n="s2_desc">Mode A: 1-bit thermal receipt with custom item lines, tape width and QR code. Mode B: 90s Polaroid with film grain, light leak and glowing LCD date stamp.</div>
         </div>
+
         <div class="step-card">
-          <div class="step-card-accent">📥</div>
-          <div class="step-num">03</div>
-          <div class="step-title">Скачай PNG</div>
-          <div class="step-desc">Нажми «Генерировать» — и через секунду получи готовый файл. Без облака, без сохранения данных, без регистрации.</div>
+          <div class="step-badge-icon">📥</div>
+          <div class="step-num-big">03</div>
+          <div class="step-name" data-i18n="s3_title">Export PNG</div>
+          <div class="step-text" data-i18n="s3_desc">Click "Generate" and download a crisp, full-resolution PNG ready for thermal printing, social media, zines, or poster collages.</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ─── EXAMPLES ──────────────────────────────────────────── -->
-  <section class="gallery-section" id="examples">
-    <div class="gallery-inner">
-      <div class="section-label">// ПРИМЕРЫ РАБОТ</div>
-      <div class="section-title" style="color:var(--ink);">Что получается на выходе</div>
+  <!-- ─── EXAMPLES / GALLERY ──────────────────────────────── -->
+  <section class="section-paper" id="gallery">
+    <div class="section-wrap">
+      <div class="sec-eyebrow" style="color:var(--ink-muted);" data-i18n="gal_eyebrow">// ARTIFACT GALLERY</div>
+      <div class="sec-headline" style="color:var(--ink);" data-i18n="gal_title">Real results generated by Retro Check</div>
 
       <div class="gallery-grid">
-        <!-- Receipt card -->
-        <div class="gallery-card">
-          <div class="gallery-card-preview">
-            <div class="gallery-receipt-preview">
-              <div style="text-align:center;font-size:8px;margin-bottom:6px;">
-                ★ TIGRAN SOLOMON'S PAPER ARCHIVE ★<br>
-                ANALOG MEMORY RETRIEVAL DIVISION
+
+        <!-- Card 1: Thermal Receipt -->
+        <div class="artifact-card">
+          <div class="card-tape"></div>
+          <div class="artifact-preview">
+            <div class="artifact-receipt-mini">
+              <div style="text-align:center;font-weight:bold;margin-bottom:4px;">
+                TIGRAN SOLOMON'S PAPER ARCHIVE<br>
+                TERMINAL #01 // 58MM TAPE
               </div>
-              <div style="background:linear-gradient(135deg,#222 0%,#555 40%,#222 100%);height:60px;margin-bottom:6px;position:relative;overflow:hidden;">
-                <div style="position:absolute;inset:0;background-image:radial-gradient(circle,#fff 1px,transparent 1px);background-size:3px 3px;opacity:0.3;"></div>
+              <div style="height:62px;background:#111;margin:6px 0;border:1px solid #000;position:relative;">
+                <div style="position:absolute;inset:0;background-image:radial-gradient(circle,#fff 1px,transparent 1px);background-size:3px 3px;opacity:0.4;"></div>
               </div>
-              <div style="display:flex;justify-content:space-between;margin:2px 0;">
-                <span>SILVER HALIDE</span><span>OK</span>
-              </div>
-              <div style="display:flex;justify-content:space-between;margin:2px 0;">
-                <span>THERMAL EMU</span><span>OK</span>
-              </div>
-              <div style="border-top:1px dashed #ccc;margin:5px 0;"></div>
-              <div style="text-align:center;font-size:6px;opacity:0.7;">ARC-17925-FF2A // 22:35</div>
+              <div style="display:flex;justify-content:space-between;"><span>01 MEMORY FRAGMENT</span><span>OK</span></div>
+              <div style="display:flex;justify-content:space-between;"><span>01 THERMAL EMULSION</span><span>OK</span></div>
+              <div style="border-top:1px dashed #777;margin:4px 0;"></div>
+              <div style="text-align:center;font-size:7px;">ARC-17925 // 100% PASS</div>
             </div>
           </div>
-          <div class="gallery-card-tag">🧾 Mode A — Thermal Receipt Archive</div>
+          <div class="artifact-info">
+            <div class="artifact-title" data-i18n="c1_title">Mode A — 58mm Thermal Tape</div>
+            <div class="artifact-desc" data-i18n="c1_desc">Floyd-Steinberg 1-bit dithering with serrated tear mask</div>
+          </div>
         </div>
 
-        <!-- Polaroid card -->
-        <div class="gallery-card">
-          <div class="gallery-card-preview" style="background:#e8e4da;">
-            <div class="gallery-polaroid-preview">
-              <div class="gallery-polaroid-photo">
-                <div style="position:absolute;bottom:6px;right:6px;font-family:var(--font-pixel);font-size:10px;color:#ff9922;text-shadow:0 0 6px rgba(255,153,34,0.8);">'98 10 24</div>
+        <!-- Card 2: Vintage Polaroid -->
+        <div class="artifact-card">
+          <div class="card-tape"></div>
+          <div class="artifact-preview">
+            <div class="artifact-polaroid-mini">
+              <div class="polaroid-screen-mini">
+                <div class="polaroid-lcd-mini">'98 04 18</div>
               </div>
-              <div style="font-family:var(--font-hand);font-size:11px;color:#333;text-align:center;padding:8px 0 2px;">Tigran Solomon's Archive</div>
+              <div class="polaroid-caption-mini">Tigran Solomon's Paper Archive</div>
             </div>
           </div>
-          <div class="gallery-card-tag">📷 Mode B — Polaroid Snap 90s</div>
+          <div class="artifact-info">
+            <div class="artifact-title" data-i18n="c2_title">Mode B — 90s Polaroid Snap</div>
+            <div class="artifact-desc" data-i18n="c2_desc">Faded blacks, warm amber highlights &amp; 7-seg LCD date</div>
+          </div>
         </div>
 
-        <!-- Custom text card -->
-        <div class="gallery-card">
-          <div class="gallery-card-preview">
-            <div class="gallery-receipt-preview">
-              <div style="text-align:center;font-size:8px;margin-bottom:6px;">
-                ★ CUSTOM ARCHIVE ★<br>
-                PERSONAL COLLECTION
+        <!-- Card 3: Custom Receipt -->
+        <div class="artifact-card">
+          <div class="card-tape"></div>
+          <div class="artifact-preview">
+            <div class="artifact-receipt-mini">
+              <div style="text-align:center;font-weight:bold;margin-bottom:4px;">
+                CUSTOM ARCHIVAL ROLL<br>
+                80MM COMMERCE PROTOCOL
               </div>
-              <div style="background:linear-gradient(160deg,#111 0%,#444 60%,#111 100%);height:50px;margin-bottom:6px;position:relative;">
-                <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,0.35) 1px,transparent 1px);background-size:2.5px 2.5px;"></div>
+              <div style="height:55px;background:#181818;margin:6px 0;border:1px solid #000;position:relative;">
+                <div style="position:absolute;inset:0;background-image:radial-gradient(circle,#fff 1px,transparent 1px);background-size:2.5px 2.5px;opacity:0.35;"></div>
               </div>
-              <div style="display:flex;justify-content:space-between;margin:2px 0;"><span>VINTAGE PRINT 01</span><span>✓</span></div>
-              <div style="display:flex;justify-content:space-between;margin:2px 0;"><span>ANALOG SCAN 02</span><span>✓</span></div>
-              <div style="display:flex;justify-content:space-between;margin:2px 0;"><span>MEMORY FRAG 03</span><span>✓</span></div>
+              <div style="display:flex;justify-content:space-between;"><span>01 ANALOG LATENT</span><span>PASS</span></div>
+              <div style="display:flex;justify-content:space-between;"><span>02 RETRIEVAL CODE</span><span>PASS</span></div>
+              <div style="border-top:1px dashed #777;margin:4px 0;"></div>
+              <div style="text-align:center;font-size:7px;">SCAN CODE TO OPEN ARCHIVE</div>
             </div>
           </div>
-          <div class="gallery-card-tag">⚙️ Кастомный список позиций чека</div>
+          <div class="artifact-info">
+            <div class="artifact-title" data-i18n="c3_title">Custom Archival Items</div>
+            <div class="artifact-desc" data-i18n="c3_desc">Editable receipt items, title, timestamp and dimensions</div>
+          </div>
         </div>
+
       </div>
     </div>
   </section>
 
-  <!-- ─── CTA ───────────────────────────────────────────────── -->
-  <section class="cta-section" id="cta">
-    <div class="cta-inner">
-      <div class="cta-title">
-        Твои снимки заслуживают<br>
-        <em>более красивой</em> жизни.
+  <!-- ─── CONTACTS & AUTHOR SECTION ──────────────────────── -->
+  <section class="section-contacts" id="contacts">
+    <div class="section-wrap">
+      <div class="contacts-card">
+
+        <div>
+          <div class="sec-eyebrow" data-i18n="cont_eyebrow">// AUTHOR &amp; CREATIVE CONTACTS</div>
+          <h2 class="contacts-title" data-i18n="cont_title">
+            Let's create <em>analog artifacts</em> together.
+          </h2>
+          <p class="contacts-lead" data-i18n="cont_lead">
+            Retro Check is created by <b>Tigran Khanoyan</b>. Follow the creative journey, illustrations, graphic experiments and new design tools on Instagram.
+          </p>
+
+          <div class="contacts-actions">
+            <a href="https://instagram.com/tkhanoyan" target="_blank" rel="noopener noreferrer" class="btn-instagram">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+              </svg>
+              <span>@tkhanoyan</span>
+            </a>
+
+            <a href="studio.html" class="btn-hero-main" data-i18n="cont_open_btn">
+              ⚡ Open Studio
+            </a>
+          </div>
+        </div>
+
+        <!-- Author Card Pin -->
+        <div class="author-badge-card">
+          <div class="author-tape-pin"></div>
+          <div class="author-avatar-row">
+            <div class="author-avatar">TK</div>
+            <div>
+              <div class="author-name">Tigran Khanoyan</div>
+              <div class="author-role" data-i18n="author_role">DESIGNER &amp; CREATIVE ARTIST</div>
+            </div>
+          </div>
+          <div class="author-bio" data-i18n="author_bio">
+            Visual artist exploring retro media, 1-bit thermal typography, analog film textures, and experimental creative tools.
+          </div>
+          <div style="font-family:var(--font-mono);font-size:0.75rem;color:#777;">
+            Instagram: <a href="https://instagram.com/tkhanoyan" target="_blank" style="color:var(--yellow);text-decoration:none;font-weight:bold;">@tkhanoyan</a>
+          </div>
+        </div>
+
       </div>
-      <div class="cta-sub">
-        Никакой регистрации. Никакого облака. Просто загрузи фото — и забери ретро-артефакт.
-      </div>
-      <a href="studio.html" class="cta-btn">
-        🧾 Открыть студию RETRO CHECK
-      </a>
     </div>
   </section>
 
-  <!-- ─── FOOTER ────────────────────────────────────────────── -->
+  <!-- ─── FOOTER ─────────────────────────────────────────── -->
   <footer>
-    <div class="footer-logo">RETRO<span>CHECK</span> × <span style="color:#555;">TIGRAN SOLOMON'S PAPER ARCHIVE</span></div>
-    <a href="studio.html" class="footer-link">↗ Открыть студию</a>
+    <div class="footer-left">
+      <b>RETRO<span>CHECK</span></b> × <span>TIGRAN SOLOMON'S PAPER ARCHIVE</span>
+      <span style="opacity:0.5;">// © 2024–2026</span>
+    </div>
+
+    <div class="footer-links">
+      <a href="https://instagram.com/tkhanoyan" target="_blank" rel="noopener">Instagram: @tkhanoyan</a>
+      <a href="studio.html" data-i18n="footer_studio">Studio App →</a>
+    </div>
   </footer>
 
+  <!-- ─── I18N SYSTEM (EN PRIMARY, THEN HY, THEN RU) ─────── -->
+  <script>
+    var I18N_DATA = {
+      en: {
+        tagline: "PHOTO TO RECEIPT / RETRO",
+        nav_home: "HOME",
+        nav_how: "HOW IT WORKS",
+        nav_gallery: "EXAMPLES",
+        nav_contacts: "CONTACTS",
+        nav_cta: "⚡ CREATE RETRO / RECEIPT",
+        eyebrow: "ANALOG VISUAL ARCHIVE",
+        subhead: "YOUR PHOTOS. RETRO VIBE. THERMAL RECEIPT.",
+        title_p1: "TRANSFORMATION STUDIO",
+        action_lead: "(WHAT WE DO)",
+        action_badge: "WE TRANSFORM",
+        f1: "Your photo into a 1-bit dithered thermal print receipt with official QR & torn edges",
+        f2: "Your photo into an authentic 90s Polaroid snap with vintage tone curves & LCD date",
+        f3: "Client-side processing directly in your browser — instant, private, no servers",
+        btn_studio: "⚡ OPEN STUDIO",
+        btn_examples: "VIEW EXAMPLES ↓",
+        tagline_bottom: "FOR CREATIVE & EXPERIMENTAL PURPOSES",
+        how_eyebrow: "// WORKFLOW",
+        how_title: "Three steps to your retro artifact",
+        s1_title: "Upload Photo",
+        s1_desc: "Drag and drop any picture (JPG, PNG, WebP) or click 'Demo'. Your original photo is never modified or uploaded to any server.",
+        s2_title: "Choose Style",
+        s2_desc: "Mode A: 1-bit thermal receipt with custom item lines, tape width and QR code. Mode B: 90s Polaroid with film grain, light leak and glowing LCD date stamp.",
+        s3_title: "Export PNG",
+        s3_desc: "Click 'Generate' and download a crisp, full-resolution PNG ready for thermal printing, social media, zines, or poster collages.",
+        gal_eyebrow: "// ARTIFACT GALLERY",
+        gal_title: "Real results generated by Retro Check",
+        c1_title: "Mode A — 58mm Thermal Tape",
+        c1_desc: "Floyd-Steinberg 1-bit dithering with serrated tear mask",
+        c2_title: "Mode B — 90s Polaroid Snap",
+        c2_desc: "Faded blacks, warm amber highlights & 7-seg LCD date",
+        c3_title: "Custom Archival Items",
+        c3_desc: "Editable receipt items, title, timestamp and dimensions",
+        cont_eyebrow: "// AUTHOR & CREATIVE CONTACTS",
+        cont_title: "Let's create analog artifacts together.",
+        cont_lead: "Retro Check is created by Tigran Khanoyan. Follow the creative journey, illustrations, graphic experiments and new design tools on Instagram.",
+        cont_open_btn: "⚡ Open Studio",
+        author_role: "DESIGNER & CREATIVE ARTIST",
+        author_bio: "Visual artist exploring retro media, 1-bit thermal typography, analog film textures, and experimental creative tools.",
+        footer_studio: "Studio App →"
+      },
+      hy: {
+        tagline: "ԼՈՒՍԱՆԿԱՐԻՑ ԿՏՐՈՆ / ՌԵՏՐՈ",
+        nav_home: "ԳԼԽԱՎՈՐ",
+        nav_how: "ԻՆՉՊԵՍ Է ԱՇԽԱՏՈՒՄ",
+        nav_gallery: "ՆՄՈՒՇՆԵՐ",
+        nav_contacts: "ԿԱՊ",
+        nav_cta: "⚡ ՍՏԵՂԾԵԼ ԿՏՐՈՆ",
+        eyebrow: "ԱՆԱԼՈԳԱՅԻՆ ՎԻԶՈՒԱԼ ԱՐԽԻՎ",
+        subhead: "ՔՈ ԼՈՒՍԱՆԿԱՐՆԵՐԸ։ ՌԵՏՐՈ։ ԿՏՐՈՆԻ ՎՐԱ։",
+        title_p1: "ՏՐԱՆՍՖՈՐՄԱՑԻԱՅԻ ՍՏՈՒԴԻԱ",
+        action_lead: "(ԻՆՉ ԵՆՔ ԱՆՈՒՄ)",
+        action_badge: "ՎԵՐԱՓՈԽՈՒՄ ԵՆՔ",
+        f1: "Քո լուսանկարը՝ 1-բիթ դիթերինգով ջերմային կտրոնի՝ QR կոդով և ատամնավոր եզրերով",
+        f2: "Քո լուսանկարը՝ 90-ականների պոլարոիդի՝ վինյետով, լույսի բծերով և LCD ամսաթվով",
+        f3: "Աշխատում է անմիջապես բրաուզերում՝ 100% գաղտնի, առանց սերվերի բեռնման",
+        btn_studio: "⚡ ԲԱՑԵԼ ՍՏՈՒԴԻԱՆ",
+        btn_examples: "ԴԻՏԵԼ ՆՄՈՒՇՆԵՐԸ ↓",
+        tagline_bottom: "ՍՏԵՂԾԱԳՈՐԾԱԿԱՆ ԵՎ ՓՈՐՁԱՐԱՐԱԿԱՆ ՆՊԱՏԱԿՆԵՐՈՎ",
+        how_eyebrow: "// ԳՈՐԾԸՆԹԱՑԸ",
+        how_title: "Երեք քայլ մինչև ռետրո-արտեֆակտը",
+        s1_title: "Բեռնեք լուսանկարը",
+        s1_desc: "Քաշեք և գցեք ցանկացած նկար (JPG, PNG, WebP) կամ սեղմեք 'Դեմո': Ձեր լուսանկարը երբեք չի փոխանցվում սերվերին:",
+        s2_title: "Ընտրեք ոճը",
+        s2_desc: "Ռեժիմ A՝ 1-բիթ ջերմային կտրոն ձեր տողերով և QR-ով: Ռեժիմ B՝ 90-ականների պոլարոիդ՝ լուսանկարչական հատիկով և LCD ամսաթվով:",
+        s3_title: "Բեռնեք PNG-ն",
+        s3_desc: "Սեղմեք 'Ստեղծել' և ստացեք բարձրորակ PNG՝ պատրաստ տպագրության, սոցցանցերի կամ կոլաժների համար:",
+        gal_eyebrow: "// ՆՄՈՒՇՆԵՐԻ ՍՐԱՀ",
+        gal_title: "Retro Check-ով ստացված իրական արդյունքներ",
+        c1_title: "Ռեժիմ A — 58մմ Ջերմային Ժապավեն",
+        c1_desc: "Floyd-Steinberg 1-բիթ դիթերինգ և ատամնավոր կտրվածք",
+        c2_title: "Ռեժիմ B — 90-ականների Պոլարոիդ",
+        c2_desc: "Մեղմ սև երանգներ, տաք շողեր և 7-սեգմենտ LCD ամսաթիվ",
+        c3_title: "Կտրոնի Անհատական Տողեր",
+        c3_desc: "Խմբագրվող ցուցակ, վերնագիր, ժամանակ և չափսեր",
+        cont_eyebrow: "// ՀԵՂԻՆԱԿ ԵՎ ԿԱՊ",
+        cont_title: "Եկեք միասին ստեղծենք անալոգային արտեֆակտներ:",
+        cont_lead: "Retro Check-ի հեղինակն է Տիգրան Խանոյանը։ Հետևեք ստեղծագործական ընթացքին, նկարազարդումներին և նոր գործիքներին Instagram-ում։",
+        cont_open_btn: "⚡ Բացել Ստուդիան",
+        author_role: "ԴԻԶԱՅՆԵՐ ԵՎ ԱՐՎԵՍՏԱԳԵՏ",
+        author_bio: "Վիզուալ արվեստագետ՝ հետազոտող ռետրո մեդիան, 1-բիթ տիպոգրաֆիկան և անալոգային գործիքները։",
+        footer_studio: "Ստուդիա →"
+      },
+      ru: {
+        tagline: "ТВОИ ФОТО. В РЕТРО. НА ЧЕКЕ.",
+        nav_home: "ГЛАВНАЯ",
+        nav_how: "КАК ЭТО РАБОТАЕТ",
+        nav_gallery: "ПРИМЕРЫ",
+        nav_contacts: "КОНТАКТЫ",
+        nav_cta: "⚡ СОЗДАТЬ ЧЕК / РЕТРО",
+        eyebrow: "СЕРВИС АНАЛОГОВОЙ СТИЛИЗАЦИИ",
+        subhead: "ТВОИ ФОТО. В РЕТРО. НА ЧЕКЕ.",
+        title_p1: "СЕРВИС ТРАНСФОРМАЦИИ",
+        action_lead: "(ЧТО МЫ ДЕЛАЕМ)",
+        action_badge: "ПРЕВРАЩАЕМ",
+        f1: "Твоё фото — в термо-чек 58мм/80мм с 1-bit дизерингом Floyd-Steinberg, QR-кодом и перфорацией",
+        f2: "Твоё фото — в полароид 90-х с виньеткой, засветкой плёнки и светящейся LCD-датой",
+        f3: "Мгновенно прямо в браузере — 100% приватно, без отправки на сервер",
+        btn_studio: "⚡ ОТКРЫТЬ СТУДИЮ",
+        btn_examples: "СМОТРЕТЬ ПРИМЕРЫ ↓",
+        tagline_bottom: "ПОД КРЕАТИВНЫЕ И ЭКСПЕРИМЕНТАЛЬНЫЕ ЗАДАЧИ",
+        how_eyebrow: "// РАБОЧИЙ ПРОЦЕСС",
+        how_title: "Три шага до ретро-артефакта",
+        s1_title: "Загрузите фото",
+        s1_desc: "Перетащите любое фото (JPG, PNG, WebP) или нажмите «Демо». Оригинал никогда не меняется и не отправляется в сеть.",
+        s2_title: "Выберите стиль",
+        s2_desc: "Режим A: 1-bit термо-чек с вашими позициями и QR. Режим B: полароид 90-х с плёночным зерном, засветкой и LCD-штампом даты.",
+        s3_title: "Скачайте PNG",
+        s3_desc: "Нажмите «Сгенерировать» и заберите чёткий файл высокого разрешения для термопринтера, печати или соцсетей.",
+        gal_eyebrow: "// ГАЛЕРЕЯ АРТЕФАКТОВ",
+        gal_title: "Реальные результаты работы Retro Check",
+        c1_title: "Режим A — Термо-лента 58мм",
+        c1_desc: "Дизеринг Floyd-Steinberg 1-бит и перфорированный край",
+        c2_title: "Режим B — Полароид 90-х",
+        c2_desc: "Выцветший чёрный, тёплые блики и 7-сегментный LCD штамп",
+        c3_title: "Кастомные позиции чека",
+        c3_desc: "Редактируемые строки, заголовок, дата и размеры ленты",
+        cont_eyebrow: "// АВТОР И КОНТАКТЫ",
+        cont_title: "Создавайте аналоговые артефакты вместе с нами.",
+        cont_lead: "Retro Check создан дизайнером и художником Тиграном Ханояном. Следите за новыми арт-инструментами, иллюстрациями и проектами в Instagram.",
+        cont_open_btn: "⚡ Открыть студию",
+        author_role: "ДИЗАЙНЕР И ХУДОЖНИК",
+        author_bio: "Визуальный художник, исследующий ретро-медиа, 1-битную термопечать, аналоговые текстуры и экспериментальные инструменты.",
+        footer_studio: "Приложение Студии →"
+      }
+    };
+
+    var currentLang = 'en';
+
+    function setLang(lang) {
+      if (!I18N_DATA[lang]) lang = 'en';
+      currentLang = lang;
+
+      // Update active button state
+      document.querySelectorAll('.lang-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+      });
+
+      // Update text
+      var dict = I18N_DATA[lang];
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        var key = el.getAttribute('data-i18n');
+        if (dict[key]) {
+          el.innerHTML = dict[key];
+        }
+      });
+
+      try {
+        localStorage.setItem('retrocheck_lang', lang);
+      } catch (e) {}
+    }
+
+    // Initialize with saved or default (en) language
+    window.addEventListener('DOMContentLoaded', function() {
+      var saved = 'en';
+      try {
+        saved = localStorage.getItem('retrocheck_lang') || 'en';
+      } catch (e) {}
+      setLang(saved);
+    });
+  </script>
 </body>
 </html>
