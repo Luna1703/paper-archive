@@ -3,1457 +3,1199 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tigran Solomon's Paper Archive</title>
+  <title>RETRO CHECK — Твои фото. В ретро. На чеке.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Playfair+Display:ital,wght@0,400..800;1,400..800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=VT323&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #0e0e11;
-      --panel: #16161c;
-      --panel-border: #282834;
-      --accent: #e5a93c;
-      --accent-hover: #f3be5c;
-      --text: #eae8e1;
-      --text-muted: #8c8a98;
-      --font-serif: 'Playfair Display', serif;
-      --font-mono: 'Space Mono', monospace;
-      --font-pixel: 'VT323', monospace;
-      --font-hand: 'Caveat', cursive;
-    }
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@300;400;500;600;700;800;900&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=VT323&display=swap" rel="stylesheet">
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+  <style>
+    /* ─── RESET ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    /* ─── TOKENS ─────────────────────────────────────────── */
+    :root {
+      --bg-chrome:   #1a1a1a;
+      --bg-paper:    #f5f2ec;
+      --bg-paper2:   #ede9e0;
+      --ink:         #181818;
+      --ink-soft:    #3d3b38;
+      --ink-muted:   #7a7672;
+      --yellow:      #f0d84a;
+      --yellow-dark: #c9a800;
+      --accent-red:  #c53030;
+      --white:       #fff;
+      --font-sans:   'Inter', sans-serif;
+      --font-mono:   'Space Mono', monospace;
+      --font-pixel:  'VT323', monospace;
+      --font-hand:   'Caveat', cursive;
     }
 
     body {
-      background-color: var(--bg);
-      color: var(--text);
-      font-family: var(--font-mono);
+      background: var(--bg-chrome);
+      font-family: var(--font-sans);
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
       overflow-x: hidden;
-      background-image: 
-        radial-gradient(circle at 15% 20%, rgba(229, 169, 60, 0.05) 0%, transparent 40%),
-        radial-gradient(circle at 85% 80%, rgba(180, 50, 30, 0.04) 0%, transparent 45%);
     }
 
-    /* Header */
-    header {
+    /* ─── PAPER TEXTURE SVG NOISE ───────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ─── NAV ────────────────────────────────────────────── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-chrome);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #2e2e2e;
+    }
+
+    .nav-logo {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+    }
+
+    .nav-logo-main {
+      font-family: var(--font-sans);
+      font-weight: 900;
+      font-size: 1.35rem;
+      letter-spacing: -0.5px;
+      color: var(--white);
+    }
+
+    .nav-logo-main span { color: var(--yellow); }
+
+    .nav-logo-sub {
+      font-size: 0.6rem;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: #666;
+      margin-top: 2px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      text-decoration: none;
+      color: #aaa;
+      border: 1px solid #333;
+      transition: all 0.18s;
+    }
+
+    .nav-links a:hover { color: var(--white); border-color: #555; }
+
+    .nav-cta {
+      background: var(--yellow) !important;
+      color: var(--ink) !important;
+      font-weight: 700 !important;
+      border-color: var(--yellow) !important;
+      padding: 8px 20px !important;
+    }
+
+    .nav-cta:hover {
+      background: #f7e55a !important;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(240,216,74,0.35);
+    }
+
+    /* ─── HERO SECTION ───────────────────────────────────── */
+    .hero {
+      position: relative;
+      min-height: calc(100vh - 57px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 24px 60px;
+      overflow: hidden;
+      background: var(--bg-chrome);
+    }
+
+    /* dark chrome frame with inner paper card */
+    .hero-frame {
+      position: relative;
+      width: 100%;
+      max-width: 1180px;
+      background: var(--bg-paper);
+      border-radius: 16px;
+      padding: 56px 64px 56px;
+      box-shadow:
+        0 0 0 2px #2e2e2e,
+        0 32px 80px rgba(0,0,0,0.6);
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    /* paper grain on frame */
+    .hero-frame::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      border-radius: 16px;
+    }
+
+    /* corner crop marks */
+    .hero-frame::after {
+      content: '';
+      position: absolute;
+      inset: 16px;
+      border: none;
+      background:
+        linear-gradient(var(--ink), var(--ink)) top left / 22px 2px no-repeat,
+        linear-gradient(var(--ink), var(--ink)) top left / 2px 22px no-repeat,
+        linear-gradient(var(--ink), var(--ink)) top right / 22px 2px no-repeat,
+        linear-gradient(var(--ink), var(--ink)) top right / 2px 22px no-repeat,
+        linear-gradient(var(--ink), var(--ink)) bottom left / 22px 2px no-repeat,
+        linear-gradient(var(--ink), var(--ink)) bottom left / 2px 22px no-repeat,
+        linear-gradient(var(--ink), var(--ink)) bottom right / 22px 2px no-repeat,
+        linear-gradient(var(--ink), var(--ink)) bottom right / 2px 22px no-repeat;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1fr 480px;
+      gap: 48px;
+      align-items: center;
+    }
+
+    /* ─── HERO LEFT ──────────────────────────────────────── */
+    .hero-left { display: flex; flex-direction: column; gap: 24px; }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--ink);
+      color: var(--yellow);
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 4px;
+      width: fit-content;
+    }
+
+    .hero-eyebrow-dot {
+      width: 6px; height: 6px;
+      background: var(--yellow);
+      border-radius: 50%;
+      animation: blink 1.4s ease-in-out infinite;
+    }
+
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+
+    .hero-subtitle-big {
+      font-family: var(--font-sans);
+      font-weight: 800;
+      font-size: 1.05rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+
+    .hero-title {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .hero-title-line1 {
+      font-family: var(--font-sans);
+      font-weight: 900;
+      font-size: clamp(2.6rem, 4vw, 3.8rem);
+      color: var(--ink);
+      line-height: 1;
+      position: relative;
+    }
+
+    .hero-title-line1::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -3px;
+      width: 100%;
+      height: 3px;
+      background: var(--ink);
+    }
+
+    .hero-title-line2 {
+      font-family: var(--font-sans);
+      font-weight: 900;
+      font-size: clamp(2.8rem, 4.5vw, 4.2rem);
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .hero-title-line2 em {
+      font-style: normal;
+      color: transparent;
+      -webkit-text-stroke: 2.5px var(--ink);
+      letter-spacing: -1px;
+    }
+
+    .hero-action-word {
+      font-family: var(--font-sans);
+      font-weight: 900;
+      font-size: clamp(3.2rem, 5.5vw, 5rem);
+      color: var(--ink);
+      line-height: 0.95;
+      position: relative;
+      display: inline-block;
+    }
+
+    .hero-action-word .yellow-bg {
+      background: var(--yellow);
+      padding: 2px 10px 4px;
+      display: inline-block;
+      transform: rotate(-0.8deg);
+    }
+
+    .hero-bullets {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .hero-bullet {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.9rem;
+      color: var(--ink-soft);
+      font-weight: 500;
+    }
+
+    .hero-bullet-icon {
+      width: 28px; height: 28px;
+      background: var(--ink);
+      color: var(--yellow);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-hero-primary {
+      background: var(--ink);
+      color: var(--yellow);
+      border: 2px solid var(--ink);
+      padding: 14px 28px;
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.18s;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-hero-primary:hover {
+      background: var(--yellow);
+      color: var(--ink);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+
+    .btn-hero-secondary {
+      background: transparent;
+      color: var(--ink);
+      border: 2px solid var(--ink);
+      padding: 14px 24px;
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.18s;
+    }
+
+    .btn-hero-secondary:hover {
+      background: var(--ink);
+      color: var(--white);
+      transform: translateY(-2px);
+    }
+
+    /* ─── HERO RIGHT: RECEIPT MOCKUP ─────────────────────── */
+    .hero-right {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Crayon doodle outlines (yellow + black) */
+    .doodle-camera {
+      position: absolute;
+      top: -40px;
+      right: -30px;
+      width: 120px;
+      height: 90px;
+      opacity: 0.18;
+    }
+
+    .doodle-receipt {
+      position: absolute;
+      bottom: -30px;
+      left: -40px;
+      width: 80px;
+      height: 120px;
+      opacity: 0.14;
+    }
+
+    /* The 3D receipt printer mockup built from divs */
+    .printer-mockup {
+      position: relative;
+      width: 340px;
+      filter: drop-shadow(0 20px 40px rgba(0,0,0,0.22));
+    }
+
+    .printer-body {
+      background: linear-gradient(160deg, #2a2a2a 0%, #111 60%, #1c1c1c 100%);
+      border-radius: 18px 18px 8px 8px;
+      padding: 28px 24px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .printer-body::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    }
+
+    .printer-slot {
+      background: #0a0a0a;
+      height: 8px;
+      border-radius: 4px;
+      margin: 10px 16px 0;
+      position: relative;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.8);
+    }
+
+    .printer-slot::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,215,74,0.15) 50%, transparent 100%);
+      animation: scan 3s ease-in-out infinite;
+    }
+
+    @keyframes scan {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .printer-indicator {
+      width: 8px; height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+      position: absolute;
+      top: 18px; right: 22px;
+      box-shadow: 0 0 8px #22c55e;
+      animation: blink 2s ease-in-out infinite;
+    }
+
+    .printer-label {
+      font-family: var(--font-mono);
+      font-size: 0.55rem;
+      letter-spacing: 2px;
+      color: #444;
+      text-align: center;
+      padding: 10px 0 4px;
+      text-transform: uppercase;
+    }
+
+    /* Emerging receipt */
+    .receipt-tail {
+      background: #fefcf9;
+      border-left: 1px solid #ddd;
+      border-right: 1px solid #ddd;
+      width: 240px;
+      margin: 0 auto;
+      padding: 14px 16px;
+      position: relative;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      font-family: var(--font-pixel);
+    }
+
+    .receipt-tail::after {
+      content: '';
+      display: block;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-top: 12px solid #fefcf9;
+      position: absolute;
+      bottom: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .receipt-photo-strip {
+      width: 100%;
+      aspect-ratio: 3/2;
+      background: linear-gradient(135deg, #1a1a1a 0%, #3d3d3d 40%, #1a1a1a 100%);
+      margin-bottom: 10px;
+      border-radius: 2px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Dithered photo simulation */
+    .receipt-photo-strip::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle, #fff 1px, transparent 1px),
+        radial-gradient(circle, #fff 0.5px, transparent 0.5px);
+      background-size: 4px 4px, 8px 8px;
+      background-position: 0 0, 2px 2px;
+      opacity: 0.3;
+    }
+
+    .receipt-photo-strip::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 40% 35%, rgba(255,255,255,0.4) 0%, transparent 60%);
+    }
+
+    .receipt-mini-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .receipt-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #1a1a1a;
+      letter-spacing: 0.5px;
+    }
+
+    .receipt-divider {
+      height: 1px;
+      border-top: 1px dashed #ccc;
+      margin: 6px 0;
+    }
+
+    .receipt-qr-mini {
+      width: 44px;
+      height: 44px;
+      background: #000;
+      border-radius: 2px;
+      margin: 8px auto 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .receipt-qr-mini::before {
+      content: '';
+      position: absolute;
+      top: 4px; left: 4px;
+      width: 14px; height: 14px;
+      border: 3px solid #fff;
+    }
+
+    .receipt-qr-mini::after {
+      content: '';
+      position: absolute;
+      top: 4px; right: 4px;
+      width: 14px; height: 14px;
+      border: 3px solid #fff;
+    }
+
+    /* ─── STICKERS ROW ───────────────────────────────────── */
+    .stickers-section {
+      position: relative;
+      z-index: 2;
+      margin-top: 40px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .sticker {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--white);
+      border: 1.5px solid var(--ink);
+      border-radius: 100px;
+      padding: 7px 16px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: 0.5px;
+      position: relative;
+      box-shadow: 2px 2px 0 var(--ink);
+      transition: all 0.15s;
+      cursor: default;
+      white-space: nowrap;
+    }
+
+    .sticker:hover {
+      transform: translateY(-2px) rotate(-1deg);
+      box-shadow: 3px 5px 0 var(--ink);
+    }
+
+    .sticker.yellow { background: var(--yellow); }
+    .sticker.dark { background: var(--ink); color: var(--yellow); box-shadow: 2px 2px 0 var(--yellow-dark); }
+
+    .sticker-icon { font-size: 0.9rem; }
+
+    .sticker-badge {
+      width: 80px; height: 80px;
+      background: var(--ink);
+      color: var(--yellow);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.5rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-align: center;
+      line-height: 1.3;
+      text-transform: uppercase;
+      flex-shrink: 0;
+      box-shadow: 2px 2px 0 var(--yellow-dark);
+      animation: spin-slow 20s linear infinite;
+    }
+
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .hero-bottom-tagline {
+      position: relative;
+      z-index: 2;
+      margin-top: 18px;
+      font-family: var(--font-sans);
+      font-size: 0.7rem;
+      letter-spacing: 3.5px;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+
+    /* ─── HOW IT WORKS ───────────────────────────────────── */
+    .section {
+      background: var(--bg-chrome);
+      padding: 80px 32px;
+    }
+
+    .section-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--yellow);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1.15;
+      margin-bottom: 48px;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .step-card {
+      background: #1e1e1e;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 28px 24px;
+      position: relative;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .step-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    }
+
+    .step-num {
+      font-family: var(--font-pixel);
+      font-size: 3.5rem;
+      color: #2a2a2a;
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+
+    .step-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+
+    .step-desc {
+      font-size: 0.83rem;
+      color: #666;
+      line-height: 1.55;
+    }
+
+    .step-card-accent {
+      position: absolute;
+      top: 20px; right: 20px;
+      width: 36px; height: 36px;
+      background: var(--yellow);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    /* ─── EXAMPLES / GALLERY ─────────────────────────────── */
+    .gallery-section {
+      background: var(--bg-paper);
+      padding: 80px 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gallery-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    .gallery-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .gallery-section .section-label { color: var(--ink-muted); }
+    .gallery-section .section-title { color: var(--ink); }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .gallery-card {
+      background: var(--white);
+      border: 1px solid #d4d0c8;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      transition: all 0.2s;
+    }
+
+    .gallery-card:hover {
+      transform: translateY(-4px) rotate(0.3deg);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+    }
+
+    .gallery-card-preview {
+      aspect-ratio: 2/3;
+      background: #f0ede5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .gallery-receipt-preview {
+      width: 75%;
+      background: #fff;
+      padding: 10px 8px;
+      font-family: var(--font-pixel);
+      font-size: 7px;
+      line-height: 1.5;
+      color: #111;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .gallery-polaroid-preview {
+      width: 80%;
+      background: #faf7f2;
+      padding: 8px 8px 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+
+    .gallery-polaroid-photo {
+      width: 100%;
+      aspect-ratio: 1;
+      background: linear-gradient(135deg, #c9a870 0%, #8b6545 50%, #4a3020 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gallery-polaroid-photo::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle, rgba(0,0,0,0.4) 1px, transparent 1px);
+      background-size: 3px 3px;
+      mix-blend-mode: multiply;
+    }
+
+    .gallery-card-tag {
+      padding: 12px 14px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--ink-soft);
+      background: var(--white);
+      letter-spacing: 0.3px;
+    }
+
+    /* ─── CTA SECTION ────────────────────────────────────── */
+    .cta-section {
+      background: var(--ink);
+      padding: 80px 32px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at center, rgba(240,216,74,0.08) 0%, transparent 70%);
+    }
+
+    .cta-inner {
+      max-width: 680px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .cta-title {
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 900;
+      color: var(--white);
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .cta-title em {
+      font-style: normal;
+      color: var(--yellow);
+    }
+
+    .cta-sub {
+      font-size: 1rem;
+      color: #888;
+      margin-bottom: 36px;
+      line-height: 1.5;
+    }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--yellow);
+      color: var(--ink);
+      padding: 16px 36px;
+      border-radius: 10px;
+      font-weight: 800;
+      font-size: 1rem;
+      text-decoration: none;
+      transition: all 0.2s;
+      box-shadow: 0 4px 24px rgba(240,216,74,0.3);
+    }
+
+    .cta-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 36px rgba(240,216,74,0.5);
+    }
+
+    /* ─── FOOTER ─────────────────────────────────────────── */
+    footer {
+      background: #111;
       padding: 24px 32px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid var(--panel-border);
-      background: rgba(14, 14, 17, 0.85);
-      backdrop-filter: blur(12px);
-      position: sticky;
-      top: 0;
-      z-index: 50;
+      border-top: 1px solid #1e1e1e;
     }
 
-    .brand {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .brand h1 {
-      font-family: var(--font-serif);
-      font-size: 1.6rem;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-      color: #fff;
-    }
-
-    .brand span {
-      font-size: 0.72rem;
-      color: var(--accent);
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-top: 2px;
-    }
-
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      background: #1c1c24;
-      padding: 6px 14px;
-      border-radius: 20px;
-      border: 1px solid var(--panel-border);
-    }
-
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      background: #34d399;
-      border-radius: 50%;
-      box-shadow: 0 0 10px #34d399;
-    }
-
-    /* Main Container */
-    main {
-      flex: 1;
-      display: grid;
-      grid-template-columns: 420px 1fr;
-      gap: 24px;
-      padding: 28px 32px;
-      max-width: 1600px;
-      margin: 0 auto;
-      width: 100%;
-    }
-
-    @media (max-width: 1024px) {
-      main {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    /* Control Panel */
-    .controls-panel {
-      background: var(--panel);
-      border: 1px solid var(--panel-border);
-      border-radius: 12px;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 22px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-      height: fit-content;
-    }
-
-    /* Mode Switcher */
-    .mode-switch-title {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-    }
-
-    .mode-switch {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      background: #111116;
-      padding: 4px;
-      border-radius: 8px;
-      border: 1px solid var(--panel-border);
-      gap: 4px;
-    }
-
-    .mode-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      padding: 10px 14px;
-      font-family: var(--font-mono);
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      border-radius: 6px;
-      transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .mode-btn.active {
-      background: var(--panel-border);
-      color: #fff;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-    }
-
-    .mode-btn:hover:not(.active) {
-      color: var(--text);
-    }
-
-    /* Upload Zone */
-    .upload-zone {
-      border: 2px dashed #3a3a4c;
-      border-radius: 10px;
-      padding: 28px 16px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      background: rgba(0, 0, 0, 0.15);
-      position: relative;
-    }
-
-    .upload-zone:hover, .upload-zone.dragover {
-      border-color: var(--accent);
-      background: rgba(229, 169, 60, 0.05);
-    }
-
-    .upload-zone input {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      opacity: 0;
-      cursor: pointer;
-    }
-
-    .upload-icon {
-      font-size: 2rem;
-      margin-bottom: 8px;
-    }
-
-    .upload-label {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-
-    .upload-sub {
-      font-size: 0.7rem;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    .sample-loader {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 8px;
-      padding-top: 8px;
-      border-top: 1px dashed var(--panel-border);
-    }
-
-    .sample-loader span {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-    }
-
-    .sample-btn {
-      background: none;
-      border: 1px solid var(--panel-border);
-      color: var(--accent);
-      font-size: 0.72rem;
-      font-family: var(--font-mono);
-      padding: 4px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-
-    .sample-btn:hover {
-      background: rgba(229, 169, 60, 0.1);
-      border-color: var(--accent);
-    }
-
-    /* Form Inputs */
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .form-group label {
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      color: var(--text-muted);
-    }
-
-    .form-input, .form-textarea, .form-select {
-      background: #111116;
-      border: 1px solid var(--panel-border);
-      border-radius: 6px;
-      padding: 10px 12px;
-      color: var(--text);
-      font-family: var(--font-mono);
-      font-size: 0.82rem;
-      transition: border-color 0.2s;
-      outline: none;
-    }
-
-    .form-input:focus, .form-textarea:focus, .form-select:focus {
-      border-color: var(--accent);
-    }
-
-    .form-textarea {
-      min-height: 85px;
-      resize: vertical;
-      line-height: 1.4;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .toggle-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 6px 0;
-    }
-
-    .toggle-row span {
-      font-size: 0.8rem;
-      color: var(--text);
-    }
-
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 40px;
-      height: 22px;
-    }
-
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #2b2b38;
-      transition: .3s;
-      border-radius: 22px;
-    }
-
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 16px;
-      width: 16px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .3s;
-      border-radius: 50%;
-    }
-
-    input:checked + .slider {
-      background-color: var(--accent);
-    }
-
-    input:checked + .slider:before {
-      transform: translateX(18px);
-    }
-
-    /* Action Buttons */
-    .btn-primary {
-      background: var(--accent);
-      color: #0e0e11;
-      border: none;
-      border-radius: 8px;
-      padding: 13px 20px;
-      font-family: var(--font-mono);
-      font-weight: 700;
+    .footer-logo {
+      font-weight: 800;
       font-size: 0.9rem;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 4px;
+      color: #fff;
     }
 
-    .btn-primary:hover {
-      background: var(--accent-hover);
-    }
+    .footer-logo span { color: var(--yellow); }
 
-    .btn-primary:active {
-      transform: scale(0.98);
-    }
-
-    /* Preview Workspace */
-    .workspace {
-      display: flex;
-      flex-direction: column;
-      background: #121217;
-      border: 1px solid var(--panel-border);
-      border-radius: 12px;
-      overflow: hidden;
-      min-height: 600px;
-    }
-
-    .workspace-header {
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--panel-border);
-      background: #181820;
-    }
-
-    .workspace-title {
-      font-size: 0.8rem;
-      color: var(--text-muted);
+    .footer-link {
+      font-size: 0.72rem;
+      color: #555;
+      text-decoration: none;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      transition: color 0.15s;
     }
 
-    .btn-download {
-      background: #252533;
-      color: #fff;
-      border: 1px solid var(--panel-border);
-      border-radius: 6px;
-      padding: 7px 16px;
-      font-family: var(--font-mono);
-      font-size: 0.78rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    .footer-link:hover { color: var(--yellow); }
+
+    /* ─── HAND-DRAWN DOODLES (SVG inline) ───────────────── */
+    .doodle-svg {
+      position: absolute;
+      pointer-events: none;
+      overflow: visible;
     }
 
-    .btn-download:hover {
-      background: var(--accent);
-      color: #0e0e11;
-      border-color: var(--accent);
+    /* ─── RESPONSIVE ─────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-right { display: none; }
+      .hero-frame { padding: 40px 28px 36px; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .gallery-grid { grid-template-columns: 1fr 1fr; }
+      nav { padding: 12px 16px; }
+      .nav-links { display: none; }
     }
 
-    .preview-canvas-container {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 20px;
-      background-image: 
-        radial-gradient(#252535 1px, transparent 1px),
-        radial-gradient(#252535 1px, #121217 1px);
-      background-size: 24px 24px;
-      background-position: 0 0, 12px 12px;
-      overflow: auto;
-      position: relative;
-    }
-
-    #renderCanvas {
-      max-width: 100%;
-      height: auto;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
-      border-radius: 2px;
-      transition: transform 0.2s ease;
-    }
-
-    .empty-state {
-      text-align: center;
-      color: var(--text-muted);
-      max-width: 380px;
-    }
-
-    .empty-state-icon {
-      font-size: 3rem;
-      margin-bottom: 12px;
-      opacity: 0.6;
-    }
-
-    .empty-state h3 {
-      font-family: var(--font-serif);
-      font-size: 1.3rem;
-      color: #fff;
-      margin-bottom: 6px;
-    }
-
-    .empty-state p {
-      font-size: 0.78rem;
-      line-height: 1.5;
-    }
-
-    /* Footer */
-    footer {
-      padding: 16px 32px;
-      border-top: 1px solid var(--panel-border);
-      text-align: center;
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      letter-spacing: 1px;
+    @media (max-width: 560px) {
+      .gallery-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="brand">
-      <h1>Tigran Solomon's Paper Archive</h1>
-      <span>Analog Visual Stylization Studio</span>
+  <!-- ─── NAV ─────────────────────────────────────────────── -->
+  <nav>
+    <div class="nav-logo">
+      <div class="nav-logo-main">RETRO<span>CHECK</span></div>
+      <div class="nav-logo-sub">PHOTO TO RECEIPT / RETRO</div>
     </div>
-    <div class="status-badge">
-      <span class="status-dot"></span>
-      <span>SYSTEM READY // CLIENT ENGINE</span>
-    </div>
-  </header>
+    <ul class="nav-links">
+      <li><a href="#">ГЛАВНАЯ</a></li>
+      <li><a href="#how">КАК ЭТО РАБОТАЕТ</a></li>
+      <li><a href="#examples">ПРИМЕРЫ</a></li>
+      <li><a href="#cta">ЦЕНЫ</a></li>
+      <li><a href="#cta">КОНТАКТЫ</a></li>
+      <li><a href="studio.html" class="nav-cta">СОЗДАТЬ ЧЕК / РЕТРО →</a></li>
+    </ul>
+  </nav>
 
-  <main>
-    <!-- Controls Sidebar -->
-    <div class="controls-panel">
-      <div>
-        <div class="mode-switch-title">Режим стилизации</div>
-        <div class="mode-switch">
-          <button class="mode-btn active" id="btnModeA" onclick="switchMode('A')">
-            <span>🧾</span> Mode A: Receipt
-          </button>
-          <button class="mode-btn" id="btnModeB" onclick="switchMode('B')">
-            <span>📷</span> Mode B: Polaroid
-          </button>
-        </div>
-      </div>
+  <!-- ─── HERO ──────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-frame">
 
-      <!-- Upload Zone -->
-      <div class="upload-zone" id="dropZone">
-        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp">
-        <div class="upload-icon">🎞️</div>
-        <div class="upload-label">Загрузите или перетащите фото</div>
-        <div class="upload-sub">Поддерживаются JPG, PNG, WEBP</div>
-        <div class="sample-loader">
-          <span>Нет под рукой фото?</span>
-          <button type="button" class="sample-btn" onclick="loadSampleImage(event)">Загрузить демо</button>
-        </div>
-      </div>
+      <!-- corner doodles -->
+      <svg class="doodle-svg" style="top:60px;right:60px;width:110px;height:90px;opacity:0.22;" viewBox="0 0 110 90" fill="none">
+        <!-- camera body crayon outline -->
+        <path d="M10 28 Q10 20 18 20 L42 20 L46 12 L64 12 L68 20 L92 20 Q100 20 100 28 L100 72 Q100 80 92 80 L18 80 Q10 80 10 72 Z" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round" fill="none" style="stroke: var(--yellow);"/>
+        <circle cx="55" cy="50" r="18" stroke="#1a1a1a" stroke-width="4" fill="none" style="stroke: var(--yellow);"/>
+        <circle cx="55" cy="50" r="9" stroke="#1a1a1a" stroke-width="3" fill="none" style="stroke: var(--yellow);"/>
+        <circle cx="84" cy="30" r="4" fill="none" stroke="#1a1a1a" stroke-width="2.5" style="stroke: var(--yellow);"/>
+      </svg>
 
-      <!-- Controls for Mode A (Receipt) -->
-      <div id="controlsModeA" class="mode-controls">
-        <div class="form-group">
-          <label>Заголовок архива</label>
-          <input type="text" id="receiptTitle" class="form-input" value="TIGRAN SOLOMON'S PAPER ARCHIVE">
-        </div>
+      <svg class="doodle-svg" style="bottom:72px;left:48px;width:60px;height:110px;opacity:0.18;" viewBox="0 0 60 110" fill="none">
+        <!-- receipt outline -->
+        <path d="M8 8 H52 V90 L46 84 L40 90 L34 84 L28 90 L22 84 L16 90 L10 84 L4 90 V8 H8" stroke="#1a1a1a" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        <line x1="14" y1="28" x2="46" y2="28" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="14" y1="40" x2="46" y2="40" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+        <line x1="14" y1="52" x2="36" y2="52" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
 
-        <div class="form-group" style="margin-top: 12px;">
-          <label>Позиции чека (каждая с новой строки)</label>
-          <textarea id="receiptItems" class="form-textarea" placeholder="01 SILVER HALIDE GRAIN&#10;01 THERMAL EMULSION 58MM&#10;01 ANALOG LATENT PRINT">SILVER HALIDE GELATIN
-THERMAL EMULSION 58MM
-1-BIT DIFFUSION MATRIX
-ANALOG MEMORY CAPTURE
-LATENT RETRIEVAL PASS</textarea>
-        </div>
+      <div class="hero-inner">
 
-        <div class="form-row" style="margin-top: 12px;">
-          <div class="form-group">
-            <label>Ширина ленты</label>
-            <select id="receiptWidth" class="form-select">
-              <option value="580" selected>580px (58mm)</option>
-              <option value="800">800px (80mm)</option>
-            </select>
+        <!-- LEFT COPY -->
+        <div class="hero-left">
+          <div class="hero-eyebrow">
+            <span class="hero-eyebrow-dot"></span>
+            СЕРВИС ТРАНСФОРМАЦИИ ФОТО
           </div>
-          <div class="form-group">
-            <label>Дизеринг</label>
-            <select id="ditherAlgo" class="form-select">
-              <option value="floyd" selected>Floyd-Steinberg</option>
-              <option value="atkinson">Atkinson</option>
-            </select>
+
+          <div class="hero-subtitle-big">ТВОИ ФОТО. В РЕТРО. НА ЧЕКЕ.</div>
+
+          <div class="hero-title">
+            <div class="hero-title-line1">СЕРВИС</div>
+            <div class="hero-title-line1" style="padding-top:8px;">ТРАНСФОРМАЦИИ</div>
+            <div class="hero-title-line2" style="margin-top:12px;"><em>RETRO</em>&nbsp;CHECK</div>
           </div>
-        </div>
 
-        <div class="form-group" style="margin-top: 12px;">
-          <label>Дата / Время (пусто = текущее)</label>
-          <input type="text" id="receiptDate" class="form-input" placeholder="1998-04-18 21:40:00">
-        </div>
-
-        <div class="toggle-row" style="margin-top: 12px;">
-          <span>Зубчатые края (перфорация)</span>
-          <label class="switch">
-            <input type="checkbox" id="receiptTornEdge" checked>
-            <span class="slider"></span>
-          </label>
-        </div>
-      </div>
-
-      <!-- Controls for Mode B (Polaroid) -->
-      <div id="controlsModeB" class="mode-controls" style="display: none;">
-        <div class="form-group">
-          <label>Подпись на рамке</label>
-          <input type="text" id="polaroidCaption" class="form-input" value="Tigran Solomon's Paper Archive">
-        </div>
-
-        <div class="form-row" style="margin-top: 12px;">
-          <div class="form-group">
-            <label>LCD Дата (90s Quartz Back)</label>
-            <input type="text" id="polaroidDate" class="form-input" placeholder="1998-04-18 (или '98 04 18)">
+          <div>
+            <div class="hero-action-word">
+              <span style="font-size:1rem;font-weight:600;letter-spacing:2px;color:var(--ink-muted);text-transform:uppercase;">(что мы делаем)</span><br>
+              <span class="yellow-bg">ПРЕВРАЩАЕМ</span>
+            </div>
           </div>
-          <div class="form-group">
-            <label>Формат кадра</label>
-            <select id="polaroidAspect" class="form-select">
-              <option value="1:1" selected>1:1 (Квадрат)</option>
-              <option value="4:5">4:5 (Классика)</option>
-            </select>
+
+          <div class="hero-bullets">
+            <div class="hero-bullet">
+              <div class="hero-bullet-icon">🧾</div>
+              <span>Твоё фото — в термо-чек с 1-bit дизерингом, QR-кодом и перфорированным краем</span>
+            </div>
+            <div class="hero-bullet">
+              <div class="hero-bullet-icon">📷</div>
+              <span>Твоё фото — в полароид 90-х с виньеткой, засветкой плёнки и LCD-датой</span>
+            </div>
+            <div class="hero-bullet">
+              <div class="hero-bullet-icon">⚡</div>
+              <span>Мгновенно, прямо в браузере — без регистрации и установки</span>
+            </div>
           </div>
+
+          <div class="hero-buttons">
+            <a href="studio.html" class="btn-hero-primary">⚡ Создать сейчас</a>
+            <a href="#examples" class="btn-hero-secondary">Посмотреть примеры →</a>
+          </div>
+
+          <!-- STICKERS -->
+          <div class="stickers-section">
+            <div class="sticker yellow"><span class="sticker-icon">📷</span>#РЕТРО-ФИЛЬТРЫ</div>
+            <div class="sticker"><span class="sticker-icon">🧾</span>#ТЕРМО-ПЕЧАТЬ</div>
+            <div class="sticker dark"><span class="sticker-icon">📸</span>#ФОТО-ЧЕКИ</div>
+            <div class="sticker"><span class="sticker-icon">📰</span>#СТАРЫЕ_ГАЗЕТЫ</div>
+            <div class="sticker"><span class="sticker-icon">⬛</span>#ЧБ_СНИМКИ</div>
+            <div class="sticker-badge">
+              ★<br>RETRO<br>CHECK<br>EST.<br>2024<br>★
+            </div>
+          </div>
+
+          <div class="hero-bottom-tagline">ПОД КРЕАТИВНЫЕ И ЭКСПЕРИМЕНТАЛЬНЫЕ ЗАДАЧИ</div>
         </div>
 
-        <div class="toggle-row" style="margin-top: 12px;">
-          <span>Случайная засветка (Light Leak)</span>
-          <label class="switch">
-            <input type="checkbox" id="polaroidLightLeak" checked>
-            <span class="slider"></span>
-          </label>
-        </div>
+        <!-- RIGHT MOCKUP -->
+        <div class="hero-right">
+          <div class="printer-mockup">
 
-        <div class="toggle-row">
-          <span>Виньетирование</span>
-          <label class="switch">
-            <input type="checkbox" id="polaroidVignette" checked>
-            <span class="slider"></span>
-          </label>
-        </div>
-      </div>
+            <!-- Printer body -->
+            <div class="printer-body">
+              <div class="printer-indicator"></div>
+              <div style="display:flex;justify-content:center;gap:10px;margin-bottom:8px;">
+                <div style="width:44px;height:14px;background:#1a1a1a;border-radius:3px;"></div>
+                <div style="width:14px;height:14px;background:#1a1a1a;border-radius:3px;"></div>
+              </div>
+              <div style="height:60px;background:linear-gradient(180deg,#0a0a0a,#111);border-radius:8px;display:flex;align-items:center;justify-content:center;margin:0 0 8px;">
+                <div style="width:70%;height:3px;background:linear-gradient(90deg,transparent,#333,transparent);border-radius:2px;"></div>
+              </div>
+              <div class="printer-slot"></div>
+              <div class="printer-label">RETRO CHECK THERMAL</div>
+            </div>
 
-      <button type="button" class="btn-primary" onclick="generateArchive()">
-        <span>⚡</span> Сгенерировать архив
-      </button>
-    </div>
+            <!-- Receipt emerging from printer -->
+            <div class="receipt-tail">
+              <div style="font-size:7px;text-align:center;letter-spacing:1px;margin-bottom:8px;font-family:var(--font-pixel);">
+                ★ TIGRAN SOLOMON'S PAPER ARCHIVE ★
+              </div>
+              <div class="receipt-photo-strip"></div>
+              <div class="receipt-divider"></div>
+              <div class="receipt-mini-lines">
+                <div class="receipt-line"><span>01 SILVER HALIDE</span><span>OK</span></div>
+                <div class="receipt-line"><span>01 THERMAL EMULSION</span><span>OK</span></div>
+                <div class="receipt-line"><span>01 LATENT PRINT</span><span>OK</span></div>
+              </div>
+              <div class="receipt-divider"></div>
+              <div style="font-size:7px;text-align:center;font-family:var(--font-pixel);letter-spacing:0.5px;">
+                ARC-1792565-F4B2<br>
+                <span style="opacity:0.5;">2024-10-18 // 22:35</span>
+              </div>
+              <div class="receipt-qr-mini"></div>
+              <div style="font-size:6px;text-align:center;font-family:var(--font-pixel);margin-top:6px;opacity:0.6;letter-spacing:1px;">
+                SCAN TO ACCESS ARCHIVE
+              </div>
 
-    <!-- Preview Canvas Workspace -->
-    <div class="workspace">
-      <div class="workspace-header">
-        <div class="workspace-title">
-          <span>🎞️</span>
-          <span id="workspaceTitleText">Предпросмотр: Mode A (Receipt Archive)</span>
-        </div>
-        <button type="button" class="btn-download" id="btnDownload" onclick="downloadArchive()" disabled>
-          <span>📥</span> Скачать PNG
-        </button>
-      </div>
+              <!-- zigzag torn bottom -->
+              <svg width="240" height="14" viewBox="0 0 240 14" style="display:block;margin:-1px -16px 0;width:calc(100% + 32px);">
+                <path d="M0,0 L8,12 L16,0 L24,12 L32,0 L40,12 L48,0 L56,12 L64,0 L72,12 L80,0 L88,12 L96,0 L104,12 L112,0 L120,12 L128,0 L136,12 L144,0 L152,12 L160,0 L168,12 L176,0 L184,12 L192,0 L200,12 L208,0 L216,12 L224,0 L232,12 L240,0" fill="#fefcf9" stroke="#ddd" stroke-width="1"/>
+              </svg>
+            </div>
 
-      <div class="preview-canvas-container" id="canvasContainer">
-        <canvas id="renderCanvas" style="display: none;"></canvas>
-        <div class="empty-state" id="emptyState">
-          <div class="empty-state-icon">📸</div>
-          <h3>Ожидание изображения</h3>
-          <p>Загрузите фото слева или нажмите «Загрузить демо», чтобы мгновенно стилизовать снимок под архивный формат.</p>
+          </div>
         </div>
       </div>
     </div>
-  </main>
+  </section>
 
+  <!-- ─── HOW IT WORKS ──────────────────────────────────────── -->
+  <section class="section" id="how">
+    <div class="section-inner">
+      <div class="section-label">// КАК ЭТО РАБОТАЕТ</div>
+      <div class="section-title">Три шага до ретро-артефакта</div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-card-accent">📁</div>
+          <div class="step-num">01</div>
+          <div class="step-title">Загрузи фото</div>
+          <div class="step-desc">Перетащи или выбери любое фото — JPG, PNG или WebP. Оригинал не изменяется, мы работаем только с копией.</div>
+        </div>
+        <div class="step-card">
+          <div class="step-card-accent">🎛️</div>
+          <div class="step-num">02</div>
+          <div class="step-title">Выбери стиль</div>
+          <div class="step-desc">Mode A — термо-чек с 1-bit дизерингом Floyd–Steinberg. Mode B — полароид 90-х с виньеткой, засветкой и LCD-датой.</div>
+        </div>
+        <div class="step-card">
+          <div class="step-card-accent">📥</div>
+          <div class="step-num">03</div>
+          <div class="step-title">Скачай PNG</div>
+          <div class="step-desc">Нажми «Генерировать» — и через секунду получи готовый файл. Без облака, без сохранения данных, без регистрации.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── EXAMPLES ──────────────────────────────────────────── -->
+  <section class="gallery-section" id="examples">
+    <div class="gallery-inner">
+      <div class="section-label">// ПРИМЕРЫ РАБОТ</div>
+      <div class="section-title" style="color:var(--ink);">Что получается на выходе</div>
+
+      <div class="gallery-grid">
+        <!-- Receipt card -->
+        <div class="gallery-card">
+          <div class="gallery-card-preview">
+            <div class="gallery-receipt-preview">
+              <div style="text-align:center;font-size:8px;margin-bottom:6px;">
+                ★ TIGRAN SOLOMON'S PAPER ARCHIVE ★<br>
+                ANALOG MEMORY RETRIEVAL DIVISION
+              </div>
+              <div style="background:linear-gradient(135deg,#222 0%,#555 40%,#222 100%);height:60px;margin-bottom:6px;position:relative;overflow:hidden;">
+                <div style="position:absolute;inset:0;background-image:radial-gradient(circle,#fff 1px,transparent 1px);background-size:3px 3px;opacity:0.3;"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin:2px 0;">
+                <span>SILVER HALIDE</span><span>OK</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin:2px 0;">
+                <span>THERMAL EMU</span><span>OK</span>
+              </div>
+              <div style="border-top:1px dashed #ccc;margin:5px 0;"></div>
+              <div style="text-align:center;font-size:6px;opacity:0.7;">ARC-17925-FF2A // 22:35</div>
+            </div>
+          </div>
+          <div class="gallery-card-tag">🧾 Mode A — Thermal Receipt Archive</div>
+        </div>
+
+        <!-- Polaroid card -->
+        <div class="gallery-card">
+          <div class="gallery-card-preview" style="background:#e8e4da;">
+            <div class="gallery-polaroid-preview">
+              <div class="gallery-polaroid-photo">
+                <div style="position:absolute;bottom:6px;right:6px;font-family:var(--font-pixel);font-size:10px;color:#ff9922;text-shadow:0 0 6px rgba(255,153,34,0.8);">'98 10 24</div>
+              </div>
+              <div style="font-family:var(--font-hand);font-size:11px;color:#333;text-align:center;padding:8px 0 2px;">Tigran Solomon's Archive</div>
+            </div>
+          </div>
+          <div class="gallery-card-tag">📷 Mode B — Polaroid Snap 90s</div>
+        </div>
+
+        <!-- Custom text card -->
+        <div class="gallery-card">
+          <div class="gallery-card-preview">
+            <div class="gallery-receipt-preview">
+              <div style="text-align:center;font-size:8px;margin-bottom:6px;">
+                ★ CUSTOM ARCHIVE ★<br>
+                PERSONAL COLLECTION
+              </div>
+              <div style="background:linear-gradient(160deg,#111 0%,#444 60%,#111 100%);height:50px;margin-bottom:6px;position:relative;">
+                <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,0.35) 1px,transparent 1px);background-size:2.5px 2.5px;"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin:2px 0;"><span>VINTAGE PRINT 01</span><span>✓</span></div>
+              <div style="display:flex;justify-content:space-between;margin:2px 0;"><span>ANALOG SCAN 02</span><span>✓</span></div>
+              <div style="display:flex;justify-content:space-between;margin:2px 0;"><span>MEMORY FRAG 03</span><span>✓</span></div>
+            </div>
+          </div>
+          <div class="gallery-card-tag">⚙️ Кастомный список позиций чека</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CTA ───────────────────────────────────────────────── -->
+  <section class="cta-section" id="cta">
+    <div class="cta-inner">
+      <div class="cta-title">
+        Твои снимки заслуживают<br>
+        <em>более красивой</em> жизни.
+      </div>
+      <div class="cta-sub">
+        Никакой регистрации. Никакого облака. Просто загрузи фото — и забери ретро-артефакт.
+      </div>
+      <a href="studio.html" class="cta-btn">
+        🧾 Открыть студию RETRO CHECK
+      </a>
+    </div>
+  </section>
+
+  <!-- ─── FOOTER ────────────────────────────────────────────── -->
   <footer>
-    TIGRAN SOLOMON'S PAPER ARCHIVE // ANALOG VISUAL RETRIEVAL // MODE A &amp; MODE B ENGINE
+    <div class="footer-logo">RETRO<span>CHECK</span> × <span style="color:#555;">TIGRAN SOLOMON'S PAPER ARCHIVE</span></div>
+    <a href="studio.html" class="footer-link">↗ Открыть студию</a>
   </footer>
 
-  <!-- Bundled Minimal QR Code Engine for Instant Zero-Dependency QR Rendering -->
-  <script>
-    // Lightweight QR code generator (Type 1-4 Byte Mode)
-    var QRCodeLib = (function () {
-      function QR8bitByte(data) {
-        this.mode = 4;
-        this.data = data;
-      }
-      QR8bitByte.prototype = {
-        getLength: function () { return this.data.length; },
-        write: function (buffer) {
-          for (var i = 0; i < this.data.length; i++) buffer.put(this.data.charCodeAt(i), 8);
-        }
-      };
-
-      function QRBitBuffer() {
-        this.buffer = [];
-        this.length = 0;
-      }
-      QRBitBuffer.prototype = {
-        get: function (index) { return ((this.buffer[Math.floor(index / 8)] >>> (7 - index % 8)) & 1) == 1; },
-        put: function (num, length) {
-          for (var i = 0; i < length; i++) this.putBit(((num >>> (length - i - 1)) & 1) == 1);
-        },
-        putBit: function (bit) {
-          if (this.length == this.buffer.length * 8) this.buffer.push(0);
-          if (bit) this.buffer[Math.floor(this.length / 8)] |= (0x80 >>> (this.length % 8));
-          this.length++;
-        }
-      };
-
-      var QRPolynomial = function (num, shift) {
-        var offset = 0;
-        while (offset < num.length && num[offset] == 0) offset++;
-        this.num = new Array(num.length - offset + shift);
-        for (var i = 0; i < num.length - offset; i++) this.num[i] = num[i + offset];
-      };
-      var QRMath = {
-        glog: function (n) { return QRMath.LOG_TABLE[n]; },
-        gexp: function (n) {
-          while (n < 0) n += 255;
-          while (n >= 256) n -= 255;
-          return QRMath.EXP_TABLE[n];
-        },
-        EXP_TABLE: new Array(256),
-        LOG_TABLE: new Array(256)
-      };
-      for (var i = 0; i < 8; i++) QRMath.EXP_TABLE[i] = 1 << i;
-      for (var i = 8; i < 256; i++) QRMath.EXP_TABLE[i] = QRMath.EXP_TABLE[i - 4] ^ QRMath.EXP_TABLE[i - 5] ^ QRMath.EXP_TABLE[i - 6] ^ QRMath.EXP_TABLE[i - 8];
-      for (var i = 0; i < 255; i++) QRMath.LOG_TABLE[QRMath.EXP_TABLE[i]] = i;
-
-      QRPolynomial.prototype = {
-        get: function (index) { return this.num[index]; },
-        getLength: function () { return this.num.length; },
-        multiply: function (e) {
-          var num = new Array(this.getLength() + e.getLength() - 1);
-          for (var i = 0; i < this.getLength(); i++) {
-            for (var j = 0; j < e.getLength(); j++) {
-              num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i)) + QRMath.glog(e.get(j)));
-            }
-          }
-          return new QRPolynomial(num, 0);
-        },
-        mod: function (e) {
-          if (this.getLength() - e.getLength() < 0) return this;
-          var ratio = QRMath.glog(this.get(0)) - QRMath.glog(e.get(0));
-          var num = new Array(this.getLength());
-          for (var i = 0; i < this.getLength(); i++) num[i] = this.get(i);
-          for (var i = 0; i < e.getLength(); i++) num[i] ^= QRMath.gexp(QRMath.glog(e.get(i)) + ratio);
-          return new QRPolynomial(num, 0).mod(e);
-        }
-      };
-
-      function QRCodeModel(typeNumber, errorCorrectLevel) {
-        this.typeNumber = typeNumber;
-        this.errorCorrectLevel = errorCorrectLevel;
-        this.modules = null;
-        this.moduleCount = 0;
-        this.dataList = [];
-      }
-      QRCodeModel.prototype = {
-        addData: function (data) { this.dataList.push(new QR8bitByte(data)); },
-        isDark: function (row, col) { return this.modules[row][col]; },
-        getModuleCount: function () { return this.moduleCount; },
-        make: function () {
-          this.moduleCount = this.typeNumber * 4 + 17;
-          this.modules = new Array(this.moduleCount);
-          for (var row = 0; row < this.moduleCount; row++) {
-            this.modules[row] = new Array(this.moduleCount);
-            for (var col = 0; col < this.moduleCount; col++) this.modules[row][col] = null;
-          }
-          this.setupPositionProbePattern(0, 0);
-          this.setupPositionProbePattern(this.moduleCount - 7, 0);
-          this.setupPositionProbePattern(0, this.moduleCount - 7);
-          this.setupTimingPattern();
-          this.mapData(this.createData(), 0);
-        },
-        setupPositionProbePattern: function (row, col) {
-          for (var r = -1; r <= 7; r++) {
-            if (row + r <= -1 || this.moduleCount <= row + r) continue;
-            for (var c = -1; c <= 7; c++) {
-              if (col + c <= -1 || this.moduleCount <= col + c) continue;
-              if ((0 <= r && r <= 6 && (c == 0 || c == 6)) || (0 <= c && c <= 6 && (r == 0 || r == 6)) || (2 <= r && r <= 4 && 2 <= c && c <= 4)) {
-                this.modules[row + r][col + c] = true;
-              } else {
-                this.modules[row + r][col + c] = false;
-              }
-            }
-          }
-        },
-        setupTimingPattern: function () {
-          for (var r = 8; r < this.moduleCount - 8; r++) {
-            if (this.modules[r][6] === null) this.modules[r][6] = (r % 2 == 0);
-          }
-          for (var c = 8; c < this.moduleCount - 8; c++) {
-            if (this.modules[6][c] === null) this.modules[6][c] = (c % 2 == 0);
-          }
-        },
-        createData: function () {
-          var buffer = new QRBitBuffer();
-          for (var i = 0; i < this.dataList.length; i++) {
-            var data = this.dataList[i];
-            buffer.put(data.mode, 4);
-            buffer.put(data.getLength(), 8);
-            data.write(buffer);
-          }
-          buffer.put(0, 4); // terminator
-          while (buffer.length % 8 != 0) buffer.putBit(false);
-          var maxData = (this.typeNumber <= 2) ? 32 : 55;
-          while (buffer.buffer.length < maxData) {
-            buffer.put(0xEC, 8);
-            if (buffer.buffer.length < maxData) buffer.put(0x11, 8);
-          }
-          return buffer.buffer;
-        },
-        mapData: function (data, mask) {
-          var inc = -1, row = this.moduleCount - 1, bitIndex = 0, byteIndex = 0;
-          for (var col = this.moduleCount - 1; col > 0; col -= 2) {
-            if (col == 6) col--;
-            while (true) {
-              for (var c = 0; c < 2; c++) {
-                if (this.modules[row][col - c] === null) {
-                  var dark = false;
-                  if (byteIndex < data.length) {
-                    dark = (((data[byteIndex] >>> (7 - bitIndex)) & 1) == 1);
-                  }
-                  this.modules[row][col - c] = dark;
-                  bitIndex++;
-                  if (bitIndex == 8) { bitIndex = 0; byteIndex++; }
-                }
-              }
-              row += inc;
-              if (row < 0 || this.moduleCount <= row) { row -= inc; inc = -inc; break; }
-            }
-          }
-        }
-      };
-
-      return {
-        generateMatrix: function (text) {
-          var type = text.length > 30 ? 4 : 2;
-          var qr = new QRCodeModel(type, 1);
-          qr.addData(text);
-          qr.make();
-          return qr;
-        }
-      };
-    })();
-  </script>
-
-    <!-- Official Archive Website QR Code Asset -->
-  <script>
-    var ARCHIVE_WEBSITE_URL = "https://luna1703.github.io/paper-archive/";
-    var archiveQRImage = new Image();
-    archiveQRImage.src = "data:image/png;base64,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";
-  </script>
-
-  <!-- Application Logic -->
-  <script>
-    var currentMode = 'A';
-    var loadedImage = null;
-
-    function switchMode(mode) {
-      currentMode = mode;
-      document.getElementById('btnModeA').classList.toggle('active', mode === 'A');
-      document.getElementById('btnModeB').classList.toggle('active', mode === 'B');
-      document.getElementById('controlsModeA').style.display = (mode === 'A') ? 'block' : 'none';
-      document.getElementById('controlsModeB').style.display = (mode === 'B') ? 'block' : 'none';
-      document.getElementById('workspaceTitleText').textContent = 
-        mode === 'A' ? 'Предпросмотр: Mode A (Receipt Archive)' : 'Предпросмотр: Mode B (Polaroid Snap)';
-      
-      if (loadedImage) {
-        generateArchive();
-      }
-    }
-
-    // File Upload Handling
-    var dropZone = document.getElementById('dropZone');
-    var fileInput = document.getElementById('fileInput');
-
-    fileInput.addEventListener('change', function(e) {
-      if (e.target.files && e.target.files[0]) {
-        handleFile(e.target.files[0]);
-      }
-    });
-
-    dropZone.addEventListener('dragover', function(e) {
-      e.preventDefault();
-      dropZone.classList.add('dragover');
-    });
-
-    dropZone.addEventListener('dragleave', function() {
-      dropZone.classList.remove('dragover');
-    });
-
-    dropZone.addEventListener('drop', function(e) {
-      e.preventDefault();
-      dropZone.classList.remove('dragover');
-      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-        handleFile(e.dataTransfer.files[0]);
-      }
-    });
-
-    function handleFile(file) {
-      var reader = new FileReader();
-      reader.onload = function(evt) {
-        var img = new Image();
-        img.onload = function() {
-          loadedImage = img;
-          generateArchive();
-        };
-        img.src = evt.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-
-    // Built-in Demo Graphic Generator
-    function loadSampleImage(event) {
-      if (event) event.stopPropagation();
-      var demoCanvas = document.createElement('canvas');
-      demoCanvas.width = 600;
-      demoCanvas.height = 600;
-      var ctx = demoCanvas.getContext('2d');
-
-      // Draw artistic portrait silhouette
-      var grad = ctx.createLinearGradient(0, 0, 600, 600);
-      grad.addColorStop(0, '#e5a93c');
-      grad.addColorStop(0.5, '#b4321e');
-      grad.addColorStop(1, '#1b1b24');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, 600, 600);
-
-      // Circles & geometry
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-      ctx.beginPath();
-      ctx.arc(300, 260, 140, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#16161c';
-      ctx.beginPath();
-      ctx.arc(300, 240, 90, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-      ctx.beginPath();
-      ctx.ellipse(300, 480, 180, 120, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      var img = new Image();
-      img.onload = function() {
-        loadedImage = img;
-        generateArchive();
-      };
-      img.src = demoCanvas.toDataURL();
-    }
-
-    // 1-Bit Dithering Functions
-    function floydSteinbergDither(imageData) {
-      var w = imageData.width;
-      var h = imageData.height;
-      var d = imageData.data;
-      var gray = new Float32Array(w * h);
-
-      // Pre-convert to grayscale with contrast stretch
-      var minVal = 255, maxVal = 0;
-      for (var i = 0; i < w * h; i++) {
-        var val = 0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2];
-        gray[i] = val;
-        if (val < minVal) minVal = val;
-        if (val > maxVal) maxVal = val;
-      }
-
-      // Histogram stretch
-      var range = (maxVal - minVal) || 1;
-      for (var i = 0; i < w * h; i++) {
-        gray[i] = Math.min(255, Math.max(0, ((gray[i] - minVal) / range) * 255));
-      }
-
-      // Diffusion
-      for (var y = 0; y < h; y++) {
-        for (var x = 0; x < w; x++) {
-          var idx = y * w + x;
-          var oldPixel = gray[idx];
-          var newPixel = oldPixel >= 128 ? 255 : 0;
-          gray[idx] = newPixel;
-          var err = oldPixel - newPixel;
-
-          if (x + 1 < w) gray[idx + 1] += err * (7 / 16);
-          if (y + 1 < h) {
-            if (x - 1 >= 0) gray[(y + 1) * w + (x - 1)] += err * (3 / 16);
-            gray[(y + 1) * w + x] += err * (5 / 16);
-            if (x + 1 < w) gray[(y + 1) * w + (x + 1)] += err * (1 / 16);
-          }
-        }
-      }
-
-      // Put back to imageData
-      for (var i = 0; i < w * h; i++) {
-        var v = gray[i] >= 128 ? 255 : 0;
-        d[i * 4] = v;
-        d[i * 4 + 1] = v;
-        d[i * 4 + 2] = v;
-        d[i * 4 + 3] = 255;
-      }
-    }
-
-    function atkinsonDither(imageData) {
-      var w = imageData.width;
-      var h = imageData.height;
-      var d = imageData.data;
-      var gray = new Float32Array(w * h);
-
-      for (var i = 0; i < w * h; i++) {
-        gray[i] = 0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2];
-      }
-
-      for (var y = 0; y < h; y++) {
-        for (var x = 0; x < w; x++) {
-          var idx = y * w + x;
-          var oldPixel = gray[idx];
-          var newPixel = oldPixel >= 128 ? 255 : 0;
-          gray[idx] = newPixel;
-          var err = (oldPixel - newPixel) / 8;
-
-          if (x + 1 < w) gray[idx + 1] += err;
-          if (x + 2 < w) gray[idx + 2] += err;
-          if (y + 1 < h) {
-            if (x - 1 >= 0) gray[(y + 1) * w + (x - 1)] += err;
-            gray[(y + 1) * w + x] += err;
-            if (x + 1 < w) gray[(y + 1) * w + (x + 1)] += err;
-          }
-          if (y + 2 < h) {
-            gray[(y + 2) * w + x] += err;
-          }
-        }
-      }
-
-      for (var i = 0; i < w * h; i++) {
-        var v = gray[i] >= 128 ? 255 : 0;
-        d[i * 4] = v;
-        d[i * 4 + 1] = v;
-        d[i * 4 + 2] = v;
-        d[i * 4 + 3] = 255;
-      }
-    }
-
-    // 7-Segment LCD Digit Renderer
-    var SEG_MAP = {
-      '0': [1,1,1,1,1,1,0], '1': [0,1,1,0,0,0,0], '2': [1,1,0,1,1,0,1],
-      '3': [1,1,1,1,0,0,1], '4': [0,1,1,0,0,1,1], '5': [1,0,1,1,0,1,1],
-      '6': [1,0,1,1,1,1,1], '7': [1,1,1,0,0,0,0], '8': [1,1,1,1,1,1,1],
-      '9': [1,1,1,1,0,1,1], '-': [0,0,0,0,0,0,1], ' ': [0,0,0,0,0,0,0]
-    };
-
-    function drawLCDDigit(ctx, x, y, char, L, T, slant, color, unlitColor) {
-      if (!SEG_MAP[char]) return;
-      var segs = SEG_MAP[char];
-      var G = T * 0.35;
-
-      function pt(px, py) {
-        var normY = (py - y) / (2 * L);
-        return { x: px + (1.0 - normY) * slant, y: py };
-      }
-
-      function drawPoly(pts, fill) {
-        ctx.fillStyle = fill;
-        ctx.beginPath();
-        var p0 = pt(pts[0][0], pts[0][1]);
-        ctx.moveTo(p0.x, p0.y);
-        for (var i = 1; i < pts.length; i++) {
-          var p = pt(pts[i][0], pts[i][1]);
-          ctx.lineTo(p.x, p.y);
-        }
-        ctx.closePath();
-        ctx.fill();
-      }
-
-      var polys = [
-        [[x + G, y], [x + L - G, y], [x + L - G - T/2, y + T], [x + G + T/2, y + T]], // a
-        [[x + L, y + G], [x + L, y + L - G], [x + L - T, y + L - G - T/2], [x + L - T, y + G + T/2]], // b
-        [[x + L, y + L + G], [x + L, y + 2*L - G], [x + L - T, y + 2*L - G - T/2], [x + L - T, y + L + G + T/2]], // c
-        [[x + G + T/2, y + 2*L - T], [x + L - G - T/2, y + 2*L - T], [x + L - G, y + 2*L], [x + G, y + 2*L]], // d
-        [[x, y + L + G], [x + T, y + L + G + T/2], [x + T, y + 2*L - G - T/2], [x, y + 2*L - G]], // e
-        [[x, y + G], [x + T, y + G + T/2], [x + T, y + L - G - T/2], [x, y + L - G]], // f
-        [[x + G + T/2, y + L - T/2], [x + L - G - T/2, y + L - T/2], [x + L - G, y + L], [x + L - G - T/2, y + L + T/2], [x + G + T/2, y + L + T/2], [x + G, y + L]] // g
-      ];
-
-      for (var i = 0; i < 7; i++) drawPoly(polys[i], unlitColor);
-      for (var i = 0; i < 7; i++) {
-        if (segs[i]) drawPoly(polys[i], color);
-      }
-    }
-
-    // Main Archive Generator
-    function generateArchive() {
-      if (!loadedImage) {
-        loadSampleImage();
-        return;
-      }
-
-      var canvas = document.getElementById('renderCanvas');
-      var ctx = canvas.getContext('2d');
-
-      if (currentMode === 'A') {
-        renderReceiptMode(canvas, ctx);
-      } else {
-        renderPolaroidMode(canvas, ctx);
-      }
-
-      canvas.style.display = 'block';
-      document.getElementById('emptyState').style.display = 'none';
-      document.getElementById('btnDownload').disabled = false;
-    }
-
-    // MODE A RENDERING
-    function renderReceiptMode(canvas, ctx) {
-      var paperWidth = parseInt(document.getElementById('receiptWidth').value) || 580;
-      var ditherType = document.getElementById('ditherAlgo').value;
-      var title = (document.getElementById('receiptTitle').value || "TIGRAN SOLOMON'S PAPER ARCHIVE").toUpperCase();
-      var tornEdges = document.getElementById('receiptTornEdge').checked;
-      var dateInput = document.getElementById('receiptDate').value.trim();
-      var dateStr = dateInput || new Date().toISOString().replace('T', ' ').substr(0, 19);
-
-      var lines = document.getElementById('receiptItems').value.split('\n')
-        .map(function(l) { return l.trim(); })
-        .filter(function(l) { return l.length > 0; });
-
-      if (lines.length === 0) {
-        lines = ["SILVER HALIDE GELATIN", "THERMAL EMULSION 58MM", "1-BIT DIFFUSION MATRIX", "ANALOG LATENT PRINT"];
-      }
-
-      // Scaled photo dimensions
-      var sideMargin = paperWidth <= 580 ? 36 : 50;
-      var photoW = paperWidth - (sideMargin * 2);
-      var aspect = loadedImage.height / loadedImage.width;
-      var photoH = Math.min(Math.round(photoW * aspect), Math.round(paperWidth * 1.3));
-
-      // Calculate total height
-      var topPadding = 40;
-      var headerH = 140;
-      var tableH = 80 + (lines.length * 28) + 70;
-      var qrH = 180;
-      var footerH = 90;
-      var totalH = topPadding + headerH + photoH + tableH + qrH + footerH + 30;
-
-      canvas.width = paperWidth;
-      canvas.height = totalH;
-
-      // Draw white receipt tape
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0, 0, paperWidth, totalH);
-
-      // Render 1-bit dithered photo onto offscreen canvas
-      var offCanvas = document.createElement('canvas');
-      offCanvas.width = photoW;
-      offCanvas.height = photoH;
-      var offCtx = offCanvas.getContext('2d');
-      offCtx.drawImage(loadedImage, 0, 0, photoW, photoH);
-      var imgData = offCtx.getImageData(0, 0, photoW, photoH);
-
-      if (ditherType === 'atkinson') {
-        atkinsonDither(imgData);
-      } else {
-        floydSteinbergDither(imgData);
-      }
-      offCtx.putImageData(imgData, 0, 0);
-
-      // Draw Typography on Receipt
-      ctx.fillStyle = '#000000';
-      ctx.textAlign = 'center';
-
-      var cursorY = topPadding + 14;
-      ctx.font = '18px "VT323", monospace';
-      ctx.fillText('* * * * * * * * * * * * * * * * *', paperWidth / 2, cursorY);
-      cursorY += 28;
-
-      ctx.font = 'bold 30px "VT323", monospace';
-      ctx.fillText(title, paperWidth / 2, cursorY);
-      cursorY += 24;
-
-      ctx.font = '18px "VT323", monospace';
-      ctx.fillText('ANALOG MEMORY RETRIEVAL DIVISION', paperWidth / 2, cursorY);
-      cursorY += 20;
-      ctx.fillText('TERMINAL #01 // ' + paperWidth + 'PX THERMAL TAPE', paperWidth / 2, cursorY);
-      cursorY += 22;
-
-      ctx.fillText('=========================================', paperWidth / 2, cursorY);
-      cursorY += 16;
-
-      // Draw photo with border
-      var photoX = (paperWidth - photoW) / 2;
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = '#000000';
-      ctx.strokeRect(photoX - 3, cursorY - 3, photoW + 6, photoH + 6);
-      ctx.drawImage(offCanvas, photoX, cursorY);
-      cursorY += photoH + 22;
-
-      ctx.font = '17px "VT323", monospace';
-      ctx.fillText('[ FIGURE 01: LATENT ARTIFACT CAPTURE ]', paperWidth / 2, cursorY);
-      cursorY += 22;
-      ctx.fillText('- - - - - - - - - - - - - - - - - - - - -', paperWidth / 2, cursorY);
-      cursorY += 24;
-
-      // Table Header
-      ctx.textAlign = 'left';
-      ctx.font = 'bold 22px "VT323", monospace';
-      var colQty = sideMargin;
-      var colDesc = sideMargin + 48;
-      var colStat = paperWidth - sideMargin - 65;
-
-      ctx.fillText('QTY', colQty, cursorY);
-      ctx.fillText('DESCRIPTION', colDesc, cursorY);
-      ctx.fillText('STAT', colStat, cursorY);
-      cursorY += 8;
-
-      ctx.beginPath();
-      ctx.moveTo(sideMargin, cursorY);
-      ctx.lineTo(paperWidth - sideMargin, cursorY);
-      ctx.lineWidth = 1;
-      ctx.stroke();
-      cursorY += 20;
-
-      // Items
-      ctx.font = '20px "VT323", monospace';
-      for (var i = 0; i < lines.length; i++) {
-        var num = (i + 1 < 10 ? '0' : '') + (i + 1);
-        ctx.fillText(num, colQty, cursorY);
-        ctx.fillText(lines[i].toUpperCase().substr(0, 24), colDesc, cursorY);
-        ctx.fillText('OK', colStat, cursorY);
-        cursorY += 26;
-      }
-
-      ctx.beginPath();
-      ctx.moveTo(sideMargin, cursorY);
-      ctx.lineTo(paperWidth - sideMargin, cursorY);
-      ctx.stroke();
-      cursorY += 22;
-
-      ctx.font = 'bold 20px "VT323", monospace';
-      ctx.fillText('ARCHIVE INTEGRITY:', colDesc, cursorY);
-      ctx.fillText('100%', colStat - 10, cursorY);
-      cursorY += 24;
-      ctx.fillText('AUTHENTICITY:', colDesc, cursorY);
-      ctx.fillText('PASS', colStat - 10, cursorY);
-      cursorY += 26;
-
-      ctx.textAlign = 'center';
-      ctx.font = '18px "VT323", monospace';
-      ctx.fillText('=========================================', paperWidth / 2, cursorY);
-      cursorY += 22;
-
-      var randSuffix = Math.floor(Math.random() * 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
-      var archiveId = 'ARC-' + Math.floor(Date.now() / 1000) + '-' + randSuffix;
-
-      ctx.font = 'bold 22px "VT323", monospace';
-      ctx.fillText('INDEX NO: ' + archiveId, paperWidth / 2, cursorY);
-      cursorY += 24;
-      ctx.font = '18px "VT323", monospace';
-      ctx.fillText('TIMESTAMP: ' + dateStr, paperWidth / 2, cursorY);
-      cursorY += 28;
-
-      // Draw Official Static Archive Website QR Code
-      var qrSize = paperWidth <= 580 ? 170 : 230;
-      var qrStartX = (paperWidth - qrSize) / 2;
-      ctx.imageSmoothingEnabled = false;
-      if (archiveQRImage && archiveQRImage.complete) {
-        ctx.drawImage(archiveQRImage, qrStartX, cursorY, qrSize, qrSize);
-      } else {
-        ctx.fillStyle = '#000000';
-        ctx.fillRect(qrStartX, cursorY, qrSize, qrSize);
-      }
-      cursorY += qrSize + 16;
-
-      ctx.font = '16px "VT323", monospace';
-      ctx.fillText('SCAN TO ACCESS PAPER ARCHIVE', paperWidth / 2, cursorY);
-      cursorY += 20;
-      ctx.fillText('HTTPS://LUNA1703.GITHUB.IO/PAPER-ARCHIVE', paperWidth / 2, cursorY);
-      cursorY += 22;
-      ctx.fillText('KEEP AWAY FROM DIRECT HEAT & SUNLIGHT', paperWidth / 2, cursorY);
-      cursorY += 20;
-      ctx.fillText('* * * THANK YOU FOR ARCHIVING * * *', paperWidth / 2, cursorY);
-      cursorY += 28;
-
-      // Cut to exact height with serrated edges
-      var finalH = cursorY;
-      var trimmedCanvas = document.createElement('canvas');
-      trimmedCanvas.width = paperWidth;
-      trimmedCanvas.height = finalH;
-      var tCtx = trimmedCanvas.getContext('2d');
-      tCtx.drawImage(canvas, 0, 0);
-
-      if (tornEdges) {
-        // Apply zigzag cut at top and bottom
-        tCtx.globalCompositeOperation = 'destination-out';
-        tCtx.fillStyle = '#000000';
-
-        var toothH = 12, toothW = 16;
-        // Top edge
-        tCtx.beginPath();
-        tCtx.moveTo(0, 0);
-        var x = 0, up = true;
-        while (x <= paperWidth) {
-          tCtx.lineTo(x, up ? toothH : 0);
-          x += toothW;
-          up = !up;
-        }
-        tCtx.lineTo(paperWidth, 0);
-        tCtx.closePath();
-        tCtx.fill();
-
-        // Bottom edge
-        tCtx.beginPath();
-        tCtx.moveTo(0, finalH);
-        x = 0; up = true;
-        while (x <= paperWidth) {
-          tCtx.lineTo(x, up ? finalH - toothH : finalH);
-          x += toothW;
-          up = !up;
-        }
-        tCtx.lineTo(paperWidth, finalH);
-        tCtx.closePath();
-        tCtx.fill();
-        tCtx.globalCompositeOperation = 'source-over';
-      }
-
-      canvas.width = paperWidth;
-      canvas.height = finalH;
-      ctx.clearRect(0, 0, paperWidth, finalH);
-      ctx.drawImage(trimmedCanvas, 0, 0);
-    }
-
-    // MODE B RENDERING (POLAROID)
-    function renderPolaroidMode(canvas, ctx) {
-      var canvasWidth = 1000;
-      var aspectChoice = document.getElementById('polaroidAspect').value;
-      var caption = document.getElementById('polaroidCaption').value || "Tigran Solomon's Paper Archive";
-      var dateInput = document.getElementById('polaroidDate').value.trim();
-      var lightLeak = document.getElementById('polaroidLightLeak').checked;
-      var vignette = document.getElementById('polaroidVignette').checked;
-
-      // Format LCD date string
-      var dateStr = "'98 04 18";
-      if (dateInput) {
-        var clean = dateInput.replace(/[\/\.]/g, '-').split('-');
-        if (clean.length === 3) {
-          dateStr = "'" + clean[0].substr(-2) + " " + clean[1].padStart(2, '0') + " " + clean[2].padStart(2, '0');
-        } else {
-          dateStr = dateInput;
-        }
-      }
-
-      var sideMargin = Math.round(canvasWidth * 0.065);
-      var topMargin = Math.round(canvasWidth * 0.065);
-      var photoW = canvasWidth - (sideMargin * 2);
-      var photoH = (aspectChoice === '4:5') ? Math.round(photoW * 1.25) : photoW;
-      var bottomMargin = Math.round(photoH * 0.36);
-      var totalH = topMargin + photoH + bottomMargin;
-
-      canvas.width = canvasWidth;
-      canvas.height = totalH;
-
-      // 1. Off-white vintage paper frame (#FAF7F2)
-      ctx.fillStyle = '#faf7f2';
-      ctx.fillRect(0, 0, canvasWidth, totalH);
-
-      // 2. Paper grain texture on frame
-      var grainCanvas = document.createElement('canvas');
-      grainCanvas.width = 120;
-      grainCanvas.height = 120;
-      var gCtx = grainCanvas.getContext('2d');
-      var gData = gCtx.createImageData(120, 120);
-      for (var i = 0; i < 120 * 120; i++) {
-        var n = Math.floor(Math.random() * 40);
-        gData.data[i * 4] = n;
-        gData.data[i * 4 + 1] = n;
-        gData.data[i * 4 + 2] = n;
-        gData.data[i * 4 + 3] = 16;
-      }
-      gCtx.putImageData(gData, 0, 0);
-      var grainPattern = ctx.createPattern(grainCanvas, 'repeat');
-      ctx.fillStyle = grainPattern;
-      ctx.fillRect(0, 0, canvasWidth, totalH);
-
-      // 3. Render Photo inside Cutout (Center crop)
-      var pCanvas = document.createElement('canvas');
-      pCanvas.width = photoW;
-      pCanvas.height = photoH;
-      var pCtx = pCanvas.getContext('2d');
-
-      var sAspect = loadedImage.width / loadedImage.height;
-      var tAspect = photoW / photoH;
-      var sx = 0, sy = 0, sw = loadedImage.width, sh = loadedImage.height;
-      if (sAspect > tAspect) {
-        sw = loadedImage.height * tAspect;
-        sx = (loadedImage.width - sw) / 2;
-      } else {
-        sh = loadedImage.width / tAspect;
-        sy = (loadedImage.height - sh) / 2;
-      }
-      pCtx.drawImage(loadedImage, sx, sy, sw, sh, 0, 0, photoW, photoH);
-
-      // Polaroid Tone Curves & Lifted Blacks
-      var pImgData = pCtx.getImageData(0, 0, photoW, photoH);
-      var pd = pImgData.data;
-      for (var i = 0; i < pd.length; i += 4) {
-        var r = pd[i], g = pd[i + 1], b = pd[i + 2];
-        // Lifted faded blacks (~32) + warm highlights
-        pd[i] = Math.min(255, 32 + Math.pow(r / 255, 0.88) * (252 - 32));
-        pd[i + 1] = Math.min(255, 28 + Math.pow(g / 255, 0.95) * (245 - 28));
-        pd[i + 2] = Math.min(255, 36 + Math.pow(b / 255, 1.15) * (228 - 36));
-      }
-      pCtx.putImageData(pImgData, 0, 0);
-
-      // Vignette
-      if (vignette) {
-        var vGrad = pCtx.createRadialGradient(photoW/2, photoH/2, photoW*0.35, photoW/2, photoH/2, photoW*0.75);
-        vGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
-        vGrad.addColorStop(1, 'rgba(0, 0, 0, 0.42)');
-        pCtx.fillStyle = vGrad;
-        pCtx.fillRect(0, 0, photoW, photoH);
-      }
-
-      // Light Leak Flare
-      if (lightLeak) {
-        pCtx.globalCompositeOperation = 'screen';
-        var leakGrad = pCtx.createRadialGradient(photoW * 0.9, photoH * 0.1, 10, photoW * 0.9, photoH * 0.1, photoW * 0.65);
-        leakGrad.addColorStop(0, 'rgba(255, 180, 50, 0.55)');
-        leakGrad.addColorStop(0.5, 'rgba(235, 75, 20, 0.25)');
-        leakGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        pCtx.fillStyle = leakGrad;
-        pCtx.fillRect(0, 0, photoW, photoH);
-        pCtx.globalCompositeOperation = 'source-over';
-      }
-
-      // Draw 90s Quartz LCD Date Stamp in Bottom-Right
-      var stampScale = 1.0;
-      var segLen = 16 * stampScale, segThick = 4.2 * stampScale;
-      var digitW = segLen + (segThick * 1.5);
-      var slant = 4.5 * stampScale;
-      var charSpacing = 6 * stampScale, wordSpacing = 18 * stampScale;
-
-      var stampTotalW = 0;
-      for (var k = 0; k < dateStr.length; k++) {
-        var ch = dateStr[k];
-        if (ch === ' ') stampTotalW += wordSpacing;
-        else if (ch === "'" || ch === '`') stampTotalW += segLen * 0.4 + charSpacing;
-        else stampTotalW += digitW + charSpacing;
-      }
-
-      var stampX = photoW - stampTotalW - 24;
-      var stampY = photoH - (2 * segLen + 10) - 22;
-
-      // Glow layer
-      pCtx.shadowColor = 'rgba(255, 120, 0, 0.85)';
-      pCtx.shadowBlur = 10;
-      var curX = stampX;
-      for (var k = 0; k < dateStr.length; k++) {
-        var ch = dateStr[k];
-        if (ch === ' ') {
-          curX += wordSpacing;
-        } else if (ch === "'" || ch === '`') {
-          pCtx.fillStyle = '#ff9922';
-          pCtx.fillRect(curX, stampY + 4, segThick, segThick * 2.2);
-          curX += segLen * 0.4 + charSpacing;
-        } else {
-          drawLCDDigit(pCtx, curX, stampY, ch, segLen, segThick, slant, '#ffaa22', 'rgba(60, 20, 0, 0.25)');
-          curX += digitW + charSpacing;
-        }
-      }
-      pCtx.shadowBlur = 0; // Reset shadow
-
-      // Paste photo into frame with bevel border
-      ctx.drawImage(pCanvas, sideMargin, topMargin);
-
-      ctx.strokeStyle = 'rgba(200, 195, 185, 0.8)';
-      ctx.lineWidth = 1;
-      ctx.strokeRect(sideMargin, topMargin, photoW, photoH);
-
-      // Handwritten Signature on bottom margin
-      ctx.fillStyle = '#222224';
-      ctx.textAlign = 'center';
-      ctx.font = '46px "Caveat", cursive';
-      var textY = topMargin + photoH + (bottomMargin / 2) + 12;
-      ctx.fillText(caption, canvasWidth / 2, textY);
-    }
-
-    // Download Handler
-    function downloadArchive() {
-      var canvas = document.getElementById('renderCanvas');
-      var link = document.createElement('a');
-      link.download = (currentMode === 'A') ? 'archive_receipt.png' : 'archive_polaroid.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    }
-
-    // Auto-init on load
-    window.onload = function() {
-      loadSampleImage();
-    };
-  </script>
 </body>
 </html>

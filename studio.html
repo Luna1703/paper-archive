@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tigran Solomon's Paper Archive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Playfair+Display:ital,wght@0,400..800;1,400..800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0e0e11;
+      --panel: #16161c;
+      --panel-border: #282834;
+      --accent: #e5a93c;
+      --accent-hover: #f3be5c;
+      --text: #eae8e1;
+      --text-muted: #8c8a98;
+      --font-serif: 'Playfair Display', serif;
+      --font-mono: 'Space Mono', monospace;
+      --font-pixel: 'VT323', monospace;
+      --font-hand: 'Caveat', cursive;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-mono);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 20%, rgba(229, 169, 60, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(180, 50, 30, 0.04) 0%, transparent 45%);
+    }
+
+    /* Header */
+    header {
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--panel-border);
+      background: rgba(14, 14, 17, 0.85);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand h1 {
+      font-family: var(--font-serif);
+      font-size: 1.6rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      color: #fff;
+    }
+
+    .brand span {
+      font-size: 0.72rem;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      background: #1c1c24;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--panel-border);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #34d399;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #34d399;
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 24px;
+      padding: 28px 32px;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    @media (max-width: 1024px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Control Panel */
+    .controls-panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      height: fit-content;
+    }
+
+    /* Mode Switcher */
+    .mode-switch-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .mode-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: #111116;
+      padding: 4px;
+      border-radius: 8px;
+      border: 1px solid var(--panel-border);
+      gap: 4px;
+    }
+
+    .mode-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px 14px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .mode-btn.active {
+      background: var(--panel-border);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    .mode-btn:hover:not(.active) {
+      color: var(--text);
+    }
+
+    /* Upload Zone */
+    .upload-zone {
+      border: 2px dashed #3a3a4c;
+      border-radius: 10px;
+      padding: 28px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: rgba(0, 0, 0, 0.15);
+      position: relative;
+    }
+
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--accent);
+      background: rgba(229, 169, 60, 0.05);
+    }
+
+    .upload-zone input {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .upload-icon {
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    .upload-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .upload-sub {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .sample-loader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--panel-border);
+    }
+
+    .sample-loader span {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .sample-btn {
+      background: none;
+      border: 1px solid var(--panel-border);
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      padding: 4px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .sample-btn:hover {
+      background: rgba(229, 169, 60, 0.1);
+      border-color: var(--accent);
+    }
+
+    /* Form Inputs */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--text-muted);
+    }
+
+    .form-input, .form-textarea, .form-select {
+      background: #111116;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+
+    .form-input:focus, .form-textarea:focus, .form-select:focus {
+      border-color: var(--accent);
+    }
+
+    .form-textarea {
+      min-height: 85px;
+      resize: vertical;
+      line-height: 1.4;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+    }
+
+    .toggle-row span {
+      font-size: 0.8rem;
+      color: var(--text);
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 22px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #2b2b38;
+      transition: .3s;
+      border-radius: 22px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--accent);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(18px);
+    }
+
+    /* Action Buttons */
+    .btn-primary {
+      background: var(--accent);
+      color: #0e0e11;
+      border: none;
+      border-radius: 8px;
+      padding: 13px 20px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    /* Preview Workspace */
+    .workspace {
+      display: flex;
+      flex-direction: column;
+      background: #121217;
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      overflow: hidden;
+      min-height: 600px;
+    }
+
+    .workspace-header {
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--panel-border);
+      background: #181820;
+    }
+
+    .workspace-title {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-download {
+      background: #252533;
+      color: #fff;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      padding: 7px 16px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-download:hover {
+      background: var(--accent);
+      color: #0e0e11;
+      border-color: var(--accent);
+    }
+
+    .preview-canvas-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      background-image: 
+        radial-gradient(#252535 1px, transparent 1px),
+        radial-gradient(#252535 1px, #121217 1px);
+      background-size: 24px 24px;
+      background-position: 0 0, 12px 12px;
+      overflow: auto;
+      position: relative;
+    }
+
+    #renderCanvas {
+      max-width: 100%;
+      height: auto;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+      border-radius: 2px;
+      transition: transform 0.2s ease;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--text-muted);
+      max-width: 380px;
+    }
+
+    .empty-state-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+      opacity: 0.6;
+    }
+
+    .empty-state h3 {
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .empty-state p {
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+
+    /* Footer */
+    footer {
+      padding: 16px 32px;
+      border-top: 1px solid var(--panel-border);
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <h1>Tigran Solomon's Paper Archive</h1>
+      <span>Analog Visual Stylization Studio</span>
+    </div>
+    <div class="status-badge">
+      <span class="status-dot"></span>
+      <span>SYSTEM READY // CLIENT ENGINE</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- Controls Sidebar -->
+    <div class="controls-panel">
+      <div>
+        <div class="mode-switch-title">Режим стилизации</div>
+        <div class="mode-switch">
+          <button class="mode-btn active" id="btnModeA" onclick="switchMode('A')">
+            <span>🧾</span> Mode A: Receipt
+          </button>
+          <button class="mode-btn" id="btnModeB" onclick="switchMode('B')">
+            <span>📷</span> Mode B: Polaroid
+          </button>
+        </div>
+      </div>
+
+      <!-- Upload Zone -->
+      <div class="upload-zone" id="dropZone">
+        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp">
+        <div class="upload-icon">🎞️</div>
+        <div class="upload-label">Загрузите или перетащите фото</div>
+        <div class="upload-sub">Поддерживаются JPG, PNG, WEBP</div>
+        <div class="sample-loader">
+          <span>Нет под рукой фото?</span>
+          <button type="button" class="sample-btn" onclick="loadSampleImage(event)">Загрузить демо</button>
+        </div>
+      </div>
+
+      <!-- Controls for Mode A (Receipt) -->
+      <div id="controlsModeA" class="mode-controls">
+        <div class="form-group">
+          <label>Заголовок архива</label>
+          <input type="text" id="receiptTitle" class="form-input" value="TIGRAN SOLOMON'S PAPER ARCHIVE">
+        </div>
+
+        <div class="form-group" style="margin-top: 12px;">
+          <label>Позиции чека (каждая с новой строки)</label>
+          <textarea id="receiptItems" class="form-textarea" placeholder="01 SILVER HALIDE GRAIN&#10;01 THERMAL EMULSION 58MM&#10;01 ANALOG LATENT PRINT">SILVER HALIDE GELATIN
+THERMAL EMULSION 58MM
+1-BIT DIFFUSION MATRIX
+ANALOG MEMORY CAPTURE
+LATENT RETRIEVAL PASS</textarea>
+        </div>
+
+        <div class="form-row" style="margin-top: 12px;">
+          <div class="form-group">
+            <label>Ширина ленты</label>
+            <select id="receiptWidth" class="form-select">
+              <option value="580" selected>580px (58mm)</option>
+              <option value="800">800px (80mm)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Дизеринг</label>
+            <select id="ditherAlgo" class="form-select">
+              <option value="floyd" selected>Floyd-Steinberg</option>
+              <option value="atkinson">Atkinson</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 12px;">
+          <label>Дата / Время (пусто = текущее)</label>
+          <input type="text" id="receiptDate" class="form-input" placeholder="1998-04-18 21:40:00">
+        </div>
+
+        <div class="toggle-row" style="margin-top: 12px;">
+          <span>Зубчатые края (перфорация)</span>
+          <label class="switch">
+            <input type="checkbox" id="receiptTornEdge" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Controls for Mode B (Polaroid) -->
+      <div id="controlsModeB" class="mode-controls" style="display: none;">
+        <div class="form-group">
+          <label>Подпись на рамке</label>
+          <input type="text" id="polaroidCaption" class="form-input" value="Tigran Solomon's Paper Archive">
+        </div>
+
+        <div class="form-row" style="margin-top: 12px;">
+          <div class="form-group">
+            <label>LCD Дата (90s Quartz Back)</label>
+            <input type="text" id="polaroidDate" class="form-input" placeholder="1998-04-18 (или '98 04 18)">
+          </div>
+          <div class="form-group">
+            <label>Формат кадра</label>
+            <select id="polaroidAspect" class="form-select">
+              <option value="1:1" selected>1:1 (Квадрат)</option>
+              <option value="4:5">4:5 (Классика)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="toggle-row" style="margin-top: 12px;">
+          <span>Случайная засветка (Light Leak)</span>
+          <label class="switch">
+            <input type="checkbox" id="polaroidLightLeak" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <span>Виньетирование</span>
+          <label class="switch">
+            <input type="checkbox" id="polaroidVignette" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <button type="button" class="btn-primary" onclick="generateArchive()">
+        <span>⚡</span> Сгенерировать архив
+      </button>
+    </div>
+
+    <!-- Preview Canvas Workspace -->
+    <div class="workspace">
+      <div class="workspace-header">
+        <div class="workspace-title">
+          <span>🎞️</span>
+          <span id="workspaceTitleText">Предпросмотр: Mode A (Receipt Archive)</span>
+        </div>
+        <button type="button" class="btn-download" id="btnDownload" onclick="downloadArchive()" disabled>
+          <span>📥</span> Скачать PNG
+        </button>
+      </div>
+
+      <div class="preview-canvas-container" id="canvasContainer">
+        <canvas id="renderCanvas" style="display: none;"></canvas>
+        <div class="empty-state" id="emptyState">
+          <div class="empty-state-icon">📸</div>
+          <h3>Ожидание изображения</h3>
+          <p>Загрузите фото слева или нажмите «Загрузить демо», чтобы мгновенно стилизовать снимок под архивный формат.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    TIGRAN SOLOMON'S PAPER ARCHIVE // ANALOG VISUAL RETRIEVAL // MODE A &amp; MODE B ENGINE
+  </footer>
+
+  <!-- Bundled Minimal QR Code Engine for Instant Zero-Dependency QR Rendering -->
+  <script>
+    // Lightweight QR code generator (Type 1-4 Byte Mode)
+    var QRCodeLib = (function () {
+      function QR8bitByte(data) {
+        this.mode = 4;
+        this.data = data;
+      }
+      QR8bitByte.prototype = {
+        getLength: function () { return this.data.length; },
+        write: function (buffer) {
+          for (var i = 0; i < this.data.length; i++) buffer.put(this.data.charCodeAt(i), 8);
+        }
+      };
+
+      function QRBitBuffer() {
+        this.buffer = [];
+        this.length = 0;
+      }
+      QRBitBuffer.prototype = {
+        get: function (index) { return ((this.buffer[Math.floor(index / 8)] >>> (7 - index % 8)) & 1) == 1; },
+        put: function (num, length) {
+          for (var i = 0; i < length; i++) this.putBit(((num >>> (length - i - 1)) & 1) == 1);
+        },
+        putBit: function (bit) {
+          if (this.length == this.buffer.length * 8) this.buffer.push(0);
+          if (bit) this.buffer[Math.floor(this.length / 8)] |= (0x80 >>> (this.length % 8));
+          this.length++;
+        }
+      };
+
+      var QRPolynomial = function (num, shift) {
+        var offset = 0;
+        while (offset < num.length && num[offset] == 0) offset++;
+        this.num = new Array(num.length - offset + shift);
+        for (var i = 0; i < num.length - offset; i++) this.num[i] = num[i + offset];
+      };
+      var QRMath = {
+        glog: function (n) { return QRMath.LOG_TABLE[n]; },
+        gexp: function (n) {
+          while (n < 0) n += 255;
+          while (n >= 256) n -= 255;
+          return QRMath.EXP_TABLE[n];
+        },
+        EXP_TABLE: new Array(256),
+        LOG_TABLE: new Array(256)
+      };
+      for (var i = 0; i < 8; i++) QRMath.EXP_TABLE[i] = 1 << i;
+      for (var i = 8; i < 256; i++) QRMath.EXP_TABLE[i] = QRMath.EXP_TABLE[i - 4] ^ QRMath.EXP_TABLE[i - 5] ^ QRMath.EXP_TABLE[i - 6] ^ QRMath.EXP_TABLE[i - 8];
+      for (var i = 0; i < 255; i++) QRMath.LOG_TABLE[QRMath.EXP_TABLE[i]] = i;
+
+      QRPolynomial.prototype = {
+        get: function (index) { return this.num[index]; },
+        getLength: function () { return this.num.length; },
+        multiply: function (e) {
+          var num = new Array(this.getLength() + e.getLength() - 1);
+          for (var i = 0; i < this.getLength(); i++) {
+            for (var j = 0; j < e.getLength(); j++) {
+              num[i + j] ^= QRMath.gexp(QRMath.glog(this.get(i)) + QRMath.glog(e.get(j)));
+            }
+          }
+          return new QRPolynomial(num, 0);
+        },
+        mod: function (e) {
+          if (this.getLength() - e.getLength() < 0) return this;
+          var ratio = QRMath.glog(this.get(0)) - QRMath.glog(e.get(0));
+          var num = new Array(this.getLength());
+          for (var i = 0; i < this.getLength(); i++) num[i] = this.get(i);
+          for (var i = 0; i < e.getLength(); i++) num[i] ^= QRMath.gexp(QRMath.glog(e.get(i)) + ratio);
+          return new QRPolynomial(num, 0).mod(e);
+        }
+      };
+
+      function QRCodeModel(typeNumber, errorCorrectLevel) {
+        this.typeNumber = typeNumber;
+        this.errorCorrectLevel = errorCorrectLevel;
+        this.modules = null;
+        this.moduleCount = 0;
+        this.dataList = [];
+      }
+      QRCodeModel.prototype = {
+        addData: function (data) { this.dataList.push(new QR8bitByte(data)); },
+        isDark: function (row, col) { return this.modules[row][col]; },
+        getModuleCount: function () { return this.moduleCount; },
+        make: function () {
+          this.moduleCount = this.typeNumber * 4 + 17;
+          this.modules = new Array(this.moduleCount);
+          for (var row = 0; row < this.moduleCount; row++) {
+            this.modules[row] = new Array(this.moduleCount);
+            for (var col = 0; col < this.moduleCount; col++) this.modules[row][col] = null;
+          }
+          this.setupPositionProbePattern(0, 0);
+          this.setupPositionProbePattern(this.moduleCount - 7, 0);
+          this.setupPositionProbePattern(0, this.moduleCount - 7);
+          this.setupTimingPattern();
+          this.mapData(this.createData(), 0);
+        },
+        setupPositionProbePattern: function (row, col) {
+          for (var r = -1; r <= 7; r++) {
+            if (row + r <= -1 || this.moduleCount <= row + r) continue;
+            for (var c = -1; c <= 7; c++) {
+              if (col + c <= -1 || this.moduleCount <= col + c) continue;
+              if ((0 <= r && r <= 6 && (c == 0 || c == 6)) || (0 <= c && c <= 6 && (r == 0 || r == 6)) || (2 <= r && r <= 4 && 2 <= c && c <= 4)) {
+                this.modules[row + r][col + c] = true;
+              } else {
+                this.modules[row + r][col + c] = false;
+              }
+            }
+          }
+        },
+        setupTimingPattern: function () {
+          for (var r = 8; r < this.moduleCount - 8; r++) {
+            if (this.modules[r][6] === null) this.modules[r][6] = (r % 2 == 0);
+          }
+          for (var c = 8; c < this.moduleCount - 8; c++) {
+            if (this.modules[6][c] === null) this.modules[6][c] = (c % 2 == 0);
+          }
+        },
+        createData: function () {
+          var buffer = new QRBitBuffer();
+          for (var i = 0; i < this.dataList.length; i++) {
+            var data = this.dataList[i];
+            buffer.put(data.mode, 4);
+            buffer.put(data.getLength(), 8);
+            data.write(buffer);
+          }
+          buffer.put(0, 4); // terminator
+          while (buffer.length % 8 != 0) buffer.putBit(false);
+          var maxData = (this.typeNumber <= 2) ? 32 : 55;
+          while (buffer.buffer.length < maxData) {
+            buffer.put(0xEC, 8);
+            if (buffer.buffer.length < maxData) buffer.put(0x11, 8);
+          }
+          return buffer.buffer;
+        },
+        mapData: function (data, mask) {
+          var inc = -1, row = this.moduleCount - 1, bitIndex = 0, byteIndex = 0;
+          for (var col = this.moduleCount - 1; col > 0; col -= 2) {
+            if (col == 6) col--;
+            while (true) {
+              for (var c = 0; c < 2; c++) {
+                if (this.modules[row][col - c] === null) {
+                  var dark = false;
+                  if (byteIndex < data.length) {
+                    dark = (((data[byteIndex] >>> (7 - bitIndex)) & 1) == 1);
+                  }
+                  this.modules[row][col - c] = dark;
+                  bitIndex++;
+                  if (bitIndex == 8) { bitIndex = 0; byteIndex++; }
+                }
+              }
+              row += inc;
+              if (row < 0 || this.moduleCount <= row) { row -= inc; inc = -inc; break; }
+            }
+          }
+        }
+      };
+
+      return {
+        generateMatrix: function (text) {
+          var type = text.length > 30 ? 4 : 2;
+          var qr = new QRCodeModel(type, 1);
+          qr.addData(text);
+          qr.make();
+          return qr;
+        }
+      };
+    })();
+  </script>
+
+    <!-- Official Archive Website QR Code Asset -->
+  <script>
+    var ARCHIVE_WEBSITE_URL = "https://luna1703.github.io/paper-archive/";
+    var archiveQRImage = new Image();
+    archiveQRImage.src = "data:image/png;base64,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";
+  </script>
+
+  <!-- Application Logic -->
+  <script>
+    var currentMode = 'A';
+    var loadedImage = null;
+
+    function switchMode(mode) {
+      currentMode = mode;
+      document.getElementById('btnModeA').classList.toggle('active', mode === 'A');
+      document.getElementById('btnModeB').classList.toggle('active', mode === 'B');
+      document.getElementById('controlsModeA').style.display = (mode === 'A') ? 'block' : 'none';
+      document.getElementById('controlsModeB').style.display = (mode === 'B') ? 'block' : 'none';
+      document.getElementById('workspaceTitleText').textContent = 
+        mode === 'A' ? 'Предпросмотр: Mode A (Receipt Archive)' : 'Предпросмотр: Mode B (Polaroid Snap)';
+      
+      if (loadedImage) {
+        generateArchive();
+      }
+    }
+
+    // File Upload Handling
+    var dropZone = document.getElementById('dropZone');
+    var fileInput = document.getElementById('fileInput');
+
+    fileInput.addEventListener('change', function(e) {
+      if (e.target.files && e.target.files[0]) {
+        handleFile(e.target.files[0]);
+      }
+    });
+
+    dropZone.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', function() {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    function handleFile(file) {
+      var reader = new FileReader();
+      reader.onload = function(evt) {
+        var img = new Image();
+        img.onload = function() {
+          loadedImage = img;
+          generateArchive();
+        };
+        img.src = evt.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Built-in Demo Graphic Generator
+    function loadSampleImage(event) {
+      if (event) event.stopPropagation();
+      var demoCanvas = document.createElement('canvas');
+      demoCanvas.width = 600;
+      demoCanvas.height = 600;
+      var ctx = demoCanvas.getContext('2d');
+
+      // Draw artistic portrait silhouette
+      var grad = ctx.createLinearGradient(0, 0, 600, 600);
+      grad.addColorStop(0, '#e5a93c');
+      grad.addColorStop(0.5, '#b4321e');
+      grad.addColorStop(1, '#1b1b24');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 600, 600);
+
+      // Circles & geometry
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+      ctx.beginPath();
+      ctx.arc(300, 260, 140, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#16161c';
+      ctx.beginPath();
+      ctx.arc(300, 240, 90, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+      ctx.beginPath();
+      ctx.ellipse(300, 480, 180, 120, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      var img = new Image();
+      img.onload = function() {
+        loadedImage = img;
+        generateArchive();
+      };
+      img.src = demoCanvas.toDataURL();
+    }
+
+    // 1-Bit Dithering Functions
+    function floydSteinbergDither(imageData) {
+      var w = imageData.width;
+      var h = imageData.height;
+      var d = imageData.data;
+      var gray = new Float32Array(w * h);
+
+      // Pre-convert to grayscale with contrast stretch
+      var minVal = 255, maxVal = 0;
+      for (var i = 0; i < w * h; i++) {
+        var val = 0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2];
+        gray[i] = val;
+        if (val < minVal) minVal = val;
+        if (val > maxVal) maxVal = val;
+      }
+
+      // Histogram stretch
+      var range = (maxVal - minVal) || 1;
+      for (var i = 0; i < w * h; i++) {
+        gray[i] = Math.min(255, Math.max(0, ((gray[i] - minVal) / range) * 255));
+      }
+
+      // Diffusion
+      for (var y = 0; y < h; y++) {
+        for (var x = 0; x < w; x++) {
+          var idx = y * w + x;
+          var oldPixel = gray[idx];
+          var newPixel = oldPixel >= 128 ? 255 : 0;
+          gray[idx] = newPixel;
+          var err = oldPixel - newPixel;
+
+          if (x + 1 < w) gray[idx + 1] += err * (7 / 16);
+          if (y + 1 < h) {
+            if (x - 1 >= 0) gray[(y + 1) * w + (x - 1)] += err * (3 / 16);
+            gray[(y + 1) * w + x] += err * (5 / 16);
+            if (x + 1 < w) gray[(y + 1) * w + (x + 1)] += err * (1 / 16);
+          }
+        }
+      }
+
+      // Put back to imageData
+      for (var i = 0; i < w * h; i++) {
+        var v = gray[i] >= 128 ? 255 : 0;
+        d[i * 4] = v;
+        d[i * 4 + 1] = v;
+        d[i * 4 + 2] = v;
+        d[i * 4 + 3] = 255;
+      }
+    }
+
+    function atkinsonDither(imageData) {
+      var w = imageData.width;
+      var h = imageData.height;
+      var d = imageData.data;
+      var gray = new Float32Array(w * h);
+
+      for (var i = 0; i < w * h; i++) {
+        gray[i] = 0.299 * d[i * 4] + 0.587 * d[i * 4 + 1] + 0.114 * d[i * 4 + 2];
+      }
+
+      for (var y = 0; y < h; y++) {
+        for (var x = 0; x < w; x++) {
+          var idx = y * w + x;
+          var oldPixel = gray[idx];
+          var newPixel = oldPixel >= 128 ? 255 : 0;
+          gray[idx] = newPixel;
+          var err = (oldPixel - newPixel) / 8;
+
+          if (x + 1 < w) gray[idx + 1] += err;
+          if (x + 2 < w) gray[idx + 2] += err;
+          if (y + 1 < h) {
+            if (x - 1 >= 0) gray[(y + 1) * w + (x - 1)] += err;
+            gray[(y + 1) * w + x] += err;
+            if (x + 1 < w) gray[(y + 1) * w + (x + 1)] += err;
+          }
+          if (y + 2 < h) {
+            gray[(y + 2) * w + x] += err;
+          }
+        }
+      }
+
+      for (var i = 0; i < w * h; i++) {
+        var v = gray[i] >= 128 ? 255 : 0;
+        d[i * 4] = v;
+        d[i * 4 + 1] = v;
+        d[i * 4 + 2] = v;
+        d[i * 4 + 3] = 255;
+      }
+    }
+
+    // 7-Segment LCD Digit Renderer
+    var SEG_MAP = {
+      '0': [1,1,1,1,1,1,0], '1': [0,1,1,0,0,0,0], '2': [1,1,0,1,1,0,1],
+      '3': [1,1,1,1,0,0,1], '4': [0,1,1,0,0,1,1], '5': [1,0,1,1,0,1,1],
+      '6': [1,0,1,1,1,1,1], '7': [1,1,1,0,0,0,0], '8': [1,1,1,1,1,1,1],
+      '9': [1,1,1,1,0,1,1], '-': [0,0,0,0,0,0,1], ' ': [0,0,0,0,0,0,0]
+    };
+
+    function drawLCDDigit(ctx, x, y, char, L, T, slant, color, unlitColor) {
+      if (!SEG_MAP[char]) return;
+      var segs = SEG_MAP[char];
+      var G = T * 0.35;
+
+      function pt(px, py) {
+        var normY = (py - y) / (2 * L);
+        return { x: px + (1.0 - normY) * slant, y: py };
+      }
+
+      function drawPoly(pts, fill) {
+        ctx.fillStyle = fill;
+        ctx.beginPath();
+        var p0 = pt(pts[0][0], pts[0][1]);
+        ctx.moveTo(p0.x, p0.y);
+        for (var i = 1; i < pts.length; i++) {
+          var p = pt(pts[i][0], pts[i][1]);
+          ctx.lineTo(p.x, p.y);
+        }
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      var polys = [
+        [[x + G, y], [x + L - G, y], [x + L - G - T/2, y + T], [x + G + T/2, y + T]], // a
+        [[x + L, y + G], [x + L, y + L - G], [x + L - T, y + L - G - T/2], [x + L - T, y + G + T/2]], // b
+        [[x + L, y + L + G], [x + L, y + 2*L - G], [x + L - T, y + 2*L - G - T/2], [x + L - T, y + L + G + T/2]], // c
+        [[x + G + T/2, y + 2*L - T], [x + L - G - T/2, y + 2*L - T], [x + L - G, y + 2*L], [x + G, y + 2*L]], // d
+        [[x, y + L + G], [x + T, y + L + G + T/2], [x + T, y + 2*L - G - T/2], [x, y + 2*L - G]], // e
+        [[x, y + G], [x + T, y + G + T/2], [x + T, y + L - G - T/2], [x, y + L - G]], // f
+        [[x + G + T/2, y + L - T/2], [x + L - G - T/2, y + L - T/2], [x + L - G, y + L], [x + L - G - T/2, y + L + T/2], [x + G + T/2, y + L + T/2], [x + G, y + L]] // g
+      ];
+
+      for (var i = 0; i < 7; i++) drawPoly(polys[i], unlitColor);
+      for (var i = 0; i < 7; i++) {
+        if (segs[i]) drawPoly(polys[i], color);
+      }
+    }
+
+    // Main Archive Generator
+    function generateArchive() {
+      if (!loadedImage) {
+        loadSampleImage();
+        return;
+      }
+
+      var canvas = document.getElementById('renderCanvas');
+      var ctx = canvas.getContext('2d');
+
+      if (currentMode === 'A') {
+        renderReceiptMode(canvas, ctx);
+      } else {
+        renderPolaroidMode(canvas, ctx);
+      }
+
+      canvas.style.display = 'block';
+      document.getElementById('emptyState').style.display = 'none';
+      document.getElementById('btnDownload').disabled = false;
+    }
+
+    // MODE A RENDERING
+    function renderReceiptMode(canvas, ctx) {
+      var paperWidth = parseInt(document.getElementById('receiptWidth').value) || 580;
+      var ditherType = document.getElementById('ditherAlgo').value;
+      var title = (document.getElementById('receiptTitle').value || "TIGRAN SOLOMON'S PAPER ARCHIVE").toUpperCase();
+      var tornEdges = document.getElementById('receiptTornEdge').checked;
+      var dateInput = document.getElementById('receiptDate').value.trim();
+      var dateStr = dateInput || new Date().toISOString().replace('T', ' ').substr(0, 19);
+
+      var lines = document.getElementById('receiptItems').value.split('\n')
+        .map(function(l) { return l.trim(); })
+        .filter(function(l) { return l.length > 0; });
+
+      if (lines.length === 0) {
+        lines = ["SILVER HALIDE GELATIN", "THERMAL EMULSION 58MM", "1-BIT DIFFUSION MATRIX", "ANALOG LATENT PRINT"];
+      }
+
+      // Scaled photo dimensions
+      var sideMargin = paperWidth <= 580 ? 36 : 50;
+      var photoW = paperWidth - (sideMargin * 2);
+      var aspect = loadedImage.height / loadedImage.width;
+      var photoH = Math.min(Math.round(photoW * aspect), Math.round(paperWidth * 1.3));
+
+      // Calculate total height
+      var topPadding = 40;
+      var headerH = 140;
+      var tableH = 80 + (lines.length * 28) + 70;
+      var qrH = 180;
+      var footerH = 90;
+      var totalH = topPadding + headerH + photoH + tableH + qrH + footerH + 30;
+
+      canvas.width = paperWidth;
+      canvas.height = totalH;
+
+      // Draw white receipt tape
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, paperWidth, totalH);
+
+      // Render 1-bit dithered photo onto offscreen canvas
+      var offCanvas = document.createElement('canvas');
+      offCanvas.width = photoW;
+      offCanvas.height = photoH;
+      var offCtx = offCanvas.getContext('2d');
+      offCtx.drawImage(loadedImage, 0, 0, photoW, photoH);
+      var imgData = offCtx.getImageData(0, 0, photoW, photoH);
+
+      if (ditherType === 'atkinson') {
+        atkinsonDither(imgData);
+      } else {
+        floydSteinbergDither(imgData);
+      }
+      offCtx.putImageData(imgData, 0, 0);
+
+      // Draw Typography on Receipt
+      ctx.fillStyle = '#000000';
+      ctx.textAlign = 'center';
+
+      var cursorY = topPadding + 14;
+      ctx.font = '18px "VT323", monospace';
+      ctx.fillText('* * * * * * * * * * * * * * * * *', paperWidth / 2, cursorY);
+      cursorY += 28;
+
+      ctx.font = 'bold 30px "VT323", monospace';
+      ctx.fillText(title, paperWidth / 2, cursorY);
+      cursorY += 24;
+
+      ctx.font = '18px "VT323", monospace';
+      ctx.fillText('ANALOG MEMORY RETRIEVAL DIVISION', paperWidth / 2, cursorY);
+      cursorY += 20;
+      ctx.fillText('TERMINAL #01 // ' + paperWidth + 'PX THERMAL TAPE', paperWidth / 2, cursorY);
+      cursorY += 22;
+
+      ctx.fillText('=========================================', paperWidth / 2, cursorY);
+      cursorY += 16;
+
+      // Draw photo with border
+      var photoX = (paperWidth - photoW) / 2;
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#000000';
+      ctx.strokeRect(photoX - 3, cursorY - 3, photoW + 6, photoH + 6);
+      ctx.drawImage(offCanvas, photoX, cursorY);
+      cursorY += photoH + 22;
+
+      ctx.font = '17px "VT323", monospace';
+      ctx.fillText('[ FIGURE 01: LATENT ARTIFACT CAPTURE ]', paperWidth / 2, cursorY);
+      cursorY += 22;
+      ctx.fillText('- - - - - - - - - - - - - - - - - - - - -', paperWidth / 2, cursorY);
+      cursorY += 24;
+
+      // Table Header
+      ctx.textAlign = 'left';
+      ctx.font = 'bold 22px "VT323", monospace';
+      var colQty = sideMargin;
+      var colDesc = sideMargin + 48;
+      var colStat = paperWidth - sideMargin - 65;
+
+      ctx.fillText('QTY', colQty, cursorY);
+      ctx.fillText('DESCRIPTION', colDesc, cursorY);
+      ctx.fillText('STAT', colStat, cursorY);
+      cursorY += 8;
+
+      ctx.beginPath();
+      ctx.moveTo(sideMargin, cursorY);
+      ctx.lineTo(paperWidth - sideMargin, cursorY);
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      cursorY += 20;
+
+      // Items
+      ctx.font = '20px "VT323", monospace';
+      for (var i = 0; i < lines.length; i++) {
+        var num = (i + 1 < 10 ? '0' : '') + (i + 1);
+        ctx.fillText(num, colQty, cursorY);
+        ctx.fillText(lines[i].toUpperCase().substr(0, 24), colDesc, cursorY);
+        ctx.fillText('OK', colStat, cursorY);
+        cursorY += 26;
+      }
+
+      ctx.beginPath();
+      ctx.moveTo(sideMargin, cursorY);
+      ctx.lineTo(paperWidth - sideMargin, cursorY);
+      ctx.stroke();
+      cursorY += 22;
+
+      ctx.font = 'bold 20px "VT323", monospace';
+      ctx.fillText('ARCHIVE INTEGRITY:', colDesc, cursorY);
+      ctx.fillText('100%', colStat - 10, cursorY);
+      cursorY += 24;
+      ctx.fillText('AUTHENTICITY:', colDesc, cursorY);
+      ctx.fillText('PASS', colStat - 10, cursorY);
+      cursorY += 26;
+
+      ctx.textAlign = 'center';
+      ctx.font = '18px "VT323", monospace';
+      ctx.fillText('=========================================', paperWidth / 2, cursorY);
+      cursorY += 22;
+
+      var randSuffix = Math.floor(Math.random() * 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+      var archiveId = 'ARC-' + Math.floor(Date.now() / 1000) + '-' + randSuffix;
+
+      ctx.font = 'bold 22px "VT323", monospace';
+      ctx.fillText('INDEX NO: ' + archiveId, paperWidth / 2, cursorY);
+      cursorY += 24;
+      ctx.font = '18px "VT323", monospace';
+      ctx.fillText('TIMESTAMP: ' + dateStr, paperWidth / 2, cursorY);
+      cursorY += 28;
+
+      // Draw Official Static Archive Website QR Code
+      var qrSize = paperWidth <= 580 ? 170 : 230;
+      var qrStartX = (paperWidth - qrSize) / 2;
+      ctx.imageSmoothingEnabled = false;
+      if (archiveQRImage && archiveQRImage.complete) {
+        ctx.drawImage(archiveQRImage, qrStartX, cursorY, qrSize, qrSize);
+      } else {
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(qrStartX, cursorY, qrSize, qrSize);
+      }
+      cursorY += qrSize + 16;
+
+      ctx.font = '16px "VT323", monospace';
+      ctx.fillText('SCAN TO ACCESS PAPER ARCHIVE', paperWidth / 2, cursorY);
+      cursorY += 20;
+      ctx.fillText('HTTPS://LUNA1703.GITHUB.IO/PAPER-ARCHIVE', paperWidth / 2, cursorY);
+      cursorY += 22;
+      ctx.fillText('KEEP AWAY FROM DIRECT HEAT & SUNLIGHT', paperWidth / 2, cursorY);
+      cursorY += 20;
+      ctx.fillText('* * * THANK YOU FOR ARCHIVING * * *', paperWidth / 2, cursorY);
+      cursorY += 28;
+
+      // Cut to exact height with serrated edges
+      var finalH = cursorY;
+      var trimmedCanvas = document.createElement('canvas');
+      trimmedCanvas.width = paperWidth;
+      trimmedCanvas.height = finalH;
+      var tCtx = trimmedCanvas.getContext('2d');
+      tCtx.drawImage(canvas, 0, 0);
+
+      if (tornEdges) {
+        // Apply zigzag cut at top and bottom
+        tCtx.globalCompositeOperation = 'destination-out';
+        tCtx.fillStyle = '#000000';
+
+        var toothH = 12, toothW = 16;
+        // Top edge
+        tCtx.beginPath();
+        tCtx.moveTo(0, 0);
+        var x = 0, up = true;
+        while (x <= paperWidth) {
+          tCtx.lineTo(x, up ? toothH : 0);
+          x += toothW;
+          up = !up;
+        }
+        tCtx.lineTo(paperWidth, 0);
+        tCtx.closePath();
+        tCtx.fill();
+
+        // Bottom edge
+        tCtx.beginPath();
+        tCtx.moveTo(0, finalH);
+        x = 0; up = true;
+        while (x <= paperWidth) {
+          tCtx.lineTo(x, up ? finalH - toothH : finalH);
+          x += toothW;
+          up = !up;
+        }
+        tCtx.lineTo(paperWidth, finalH);
+        tCtx.closePath();
+        tCtx.fill();
+        tCtx.globalCompositeOperation = 'source-over';
+      }
+
+      canvas.width = paperWidth;
+      canvas.height = finalH;
+      ctx.clearRect(0, 0, paperWidth, finalH);
+      ctx.drawImage(trimmedCanvas, 0, 0);
+    }
+
+    // MODE B RENDERING (POLAROID)
+    function renderPolaroidMode(canvas, ctx) {
+      var canvasWidth = 1000;
+      var aspectChoice = document.getElementById('polaroidAspect').value;
+      var caption = document.getElementById('polaroidCaption').value || "Tigran Solomon's Paper Archive";
+      var dateInput = document.getElementById('polaroidDate').value.trim();
+      var lightLeak = document.getElementById('polaroidLightLeak').checked;
+      var vignette = document.getElementById('polaroidVignette').checked;
+
+      // Format LCD date string
+      var dateStr = "'98 04 18";
+      if (dateInput) {
+        var clean = dateInput.replace(/[\/\.]/g, '-').split('-');
+        if (clean.length === 3) {
+          dateStr = "'" + clean[0].substr(-2) + " " + clean[1].padStart(2, '0') + " " + clean[2].padStart(2, '0');
+        } else {
+          dateStr = dateInput;
+        }
+      }
+
+      var sideMargin = Math.round(canvasWidth * 0.065);
+      var topMargin = Math.round(canvasWidth * 0.065);
+      var photoW = canvasWidth - (sideMargin * 2);
+      var photoH = (aspectChoice === '4:5') ? Math.round(photoW * 1.25) : photoW;
+      var bottomMargin = Math.round(photoH * 0.36);
+      var totalH = topMargin + photoH + bottomMargin;
+
+      canvas.width = canvasWidth;
+      canvas.height = totalH;
+
+      // 1. Off-white vintage paper frame (#FAF7F2)
+      ctx.fillStyle = '#faf7f2';
+      ctx.fillRect(0, 0, canvasWidth, totalH);
+
+      // 2. Paper grain texture on frame
+      var grainCanvas = document.createElement('canvas');
+      grainCanvas.width = 120;
+      grainCanvas.height = 120;
+      var gCtx = grainCanvas.getContext('2d');
+      var gData = gCtx.createImageData(120, 120);
+      for (var i = 0; i < 120 * 120; i++) {
+        var n = Math.floor(Math.random() * 40);
+        gData.data[i * 4] = n;
+        gData.data[i * 4 + 1] = n;
+        gData.data[i * 4 + 2] = n;
+        gData.data[i * 4 + 3] = 16;
+      }
+      gCtx.putImageData(gData, 0, 0);
+      var grainPattern = ctx.createPattern(grainCanvas, 'repeat');
+      ctx.fillStyle = grainPattern;
+      ctx.fillRect(0, 0, canvasWidth, totalH);
+
+      // 3. Render Photo inside Cutout (Center crop)
+      var pCanvas = document.createElement('canvas');
+      pCanvas.width = photoW;
+      pCanvas.height = photoH;
+      var pCtx = pCanvas.getContext('2d');
+
+      var sAspect = loadedImage.width / loadedImage.height;
+      var tAspect = photoW / photoH;
+      var sx = 0, sy = 0, sw = loadedImage.width, sh = loadedImage.height;
+      if (sAspect > tAspect) {
+        sw = loadedImage.height * tAspect;
+        sx = (loadedImage.width - sw) / 2;
+      } else {
+        sh = loadedImage.width / tAspect;
+        sy = (loadedImage.height - sh) / 2;
+      }
+      pCtx.drawImage(loadedImage, sx, sy, sw, sh, 0, 0, photoW, photoH);
+
+      // Polaroid Tone Curves & Lifted Blacks
+      var pImgData = pCtx.getImageData(0, 0, photoW, photoH);
+      var pd = pImgData.data;
+      for (var i = 0; i < pd.length; i += 4) {
+        var r = pd[i], g = pd[i + 1], b = pd[i + 2];
+        // Lifted faded blacks (~32) + warm highlights
+        pd[i] = Math.min(255, 32 + Math.pow(r / 255, 0.88) * (252 - 32));
+        pd[i + 1] = Math.min(255, 28 + Math.pow(g / 255, 0.95) * (245 - 28));
+        pd[i + 2] = Math.min(255, 36 + Math.pow(b / 255, 1.15) * (228 - 36));
+      }
+      pCtx.putImageData(pImgData, 0, 0);
+
+      // Vignette
+      if (vignette) {
+        var vGrad = pCtx.createRadialGradient(photoW/2, photoH/2, photoW*0.35, photoW/2, photoH/2, photoW*0.75);
+        vGrad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+        vGrad.addColorStop(1, 'rgba(0, 0, 0, 0.42)');
+        pCtx.fillStyle = vGrad;
+        pCtx.fillRect(0, 0, photoW, photoH);
+      }
+
+      // Light Leak Flare
+      if (lightLeak) {
+        pCtx.globalCompositeOperation = 'screen';
+        var leakGrad = pCtx.createRadialGradient(photoW * 0.9, photoH * 0.1, 10, photoW * 0.9, photoH * 0.1, photoW * 0.65);
+        leakGrad.addColorStop(0, 'rgba(255, 180, 50, 0.55)');
+        leakGrad.addColorStop(0.5, 'rgba(235, 75, 20, 0.25)');
+        leakGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        pCtx.fillStyle = leakGrad;
+        pCtx.fillRect(0, 0, photoW, photoH);
+        pCtx.globalCompositeOperation = 'source-over';
+      }
+
+      // Draw 90s Quartz LCD Date Stamp in Bottom-Right
+      var stampScale = 1.0;
+      var segLen = 16 * stampScale, segThick = 4.2 * stampScale;
+      var digitW = segLen + (segThick * 1.5);
+      var slant = 4.5 * stampScale;
+      var charSpacing = 6 * stampScale, wordSpacing = 18 * stampScale;
+
+      var stampTotalW = 0;
+      for (var k = 0; k < dateStr.length; k++) {
+        var ch = dateStr[k];
+        if (ch === ' ') stampTotalW += wordSpacing;
+        else if (ch === "'" || ch === '`') stampTotalW += segLen * 0.4 + charSpacing;
+        else stampTotalW += digitW + charSpacing;
+      }
+
+      var stampX = photoW - stampTotalW - 24;
+      var stampY = photoH - (2 * segLen + 10) - 22;
+
+      // Glow layer
+      pCtx.shadowColor = 'rgba(255, 120, 0, 0.85)';
+      pCtx.shadowBlur = 10;
+      var curX = stampX;
+      for (var k = 0; k < dateStr.length; k++) {
+        var ch = dateStr[k];
+        if (ch === ' ') {
+          curX += wordSpacing;
+        } else if (ch === "'" || ch === '`') {
+          pCtx.fillStyle = '#ff9922';
+          pCtx.fillRect(curX, stampY + 4, segThick, segThick * 2.2);
+          curX += segLen * 0.4 + charSpacing;
+        } else {
+          drawLCDDigit(pCtx, curX, stampY, ch, segLen, segThick, slant, '#ffaa22', 'rgba(60, 20, 0, 0.25)');
+          curX += digitW + charSpacing;
+        }
+      }
+      pCtx.shadowBlur = 0; // Reset shadow
+
+      // Paste photo into frame with bevel border
+      ctx.drawImage(pCanvas, sideMargin, topMargin);
+
+      ctx.strokeStyle = 'rgba(200, 195, 185, 0.8)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(sideMargin, topMargin, photoW, photoH);
+
+      // Handwritten Signature on bottom margin
+      ctx.fillStyle = '#222224';
+      ctx.textAlign = 'center';
+      ctx.font = '46px "Caveat", cursive';
+      var textY = topMargin + photoH + (bottomMargin / 2) + 12;
+      ctx.fillText(caption, canvasWidth / 2, textY);
+    }
+
+    // Download Handler
+    function downloadArchive() {
+      var canvas = document.getElementById('renderCanvas');
+      var link = document.createElement('a');
+      link.download = (currentMode === 'A') ? 'archive_receipt.png' : 'archive_polaroid.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // Auto-init on load
+    window.onload = function() {
+      loadSampleImage();
+    };
+  </script>
+</body>
+</html>
