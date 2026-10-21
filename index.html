@@ -1182,14 +1182,24 @@
 
     /* ─── RESPONSIVE ─────────────────────────────────────── */
     @media (max-width: 980px) {
-      nav { padding: 12px 20px; }
+      nav { padding: 10px 16px; flex-wrap: wrap; gap: 8px; }
       .nav-center { display: none; }
-      .hero-layout { grid-template-columns: 1fr; }
-      .hero-visual { display: none; }
-      .hero-frame { padding: 36px 24px; }
-      .steps-grid { grid-template-columns: 1fr; }
-      .gallery-grid { grid-template-columns: 1fr; }
-      .contacts-card { grid-template-columns: 1fr; padding: 36px 24px; }
+      .nav-right { width: 100%; justify-content: space-between; }
+      .hero { padding: 16px 12px 36px; }
+      .hero-frame { padding: 28px 16px 24px; border-radius: 12px; }
+      .hero-layout { grid-template-columns: 1fr; gap: 24px; }
+      .hero-visual { display: flex; transform: scale(0.85); margin: -20px auto; }
+      .hero-cta-group { flex-direction: column; width: 100%; }
+      .btn-hero-main, .btn-hero-ghost { width: 100%; justify-content: center; }
+      .action-badge { font-size: 2rem; }
+      .spinning-badge { display: none; }
+      .marquee-bands { height: 110px; margin-top: -15px; }
+      .band-track { font-size: 0.85rem; }
+      .section-dark, .section-paper, .section-contacts { padding: 50px 16px; }
+      .steps-grid { grid-template-columns: 1fr; gap: 16px; }
+      .gallery-grid { grid-template-columns: 1fr; gap: 20px; }
+      .contacts-card { grid-template-columns: 1fr; padding: 28px 18px; gap: 28px; }
+      footer { flex-direction: column; gap: 12px; text-align: center; padding: 20px 16px; }
     }
   </style>
 </head>

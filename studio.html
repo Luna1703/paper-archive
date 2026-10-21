@@ -159,7 +159,16 @@
     }
 
     @media (max-width: 1060px) {
-      main { grid-template-columns: 1fr; }
+      nav { padding: 10px 14px; flex-wrap: wrap; gap: 8px; }
+      .nav-actions { width: 100%; justify-content: space-between; }
+      main { grid-template-columns: 1fr; padding: 14px 12px 24px; gap: 20px; }
+      .controls-paper { padding: 20px 14px; border-radius: 10px; }
+      .fields-2col { grid-template-columns: 1fr; }
+      .workspace-panel { min-height: 480px; }
+      .workspace-top-bar { flex-direction: column; gap: 10px; align-items: stretch; }
+      .btn-download-artifact { justify-content: center; width: 100%; }
+      .canvas-viewport { padding: 16px 8px; }
+      footer { flex-direction: column; gap: 8px; text-align: center; padding: 14px; }
     }
 
     /* ─── CONTROLS PANEL (PAPER AESTHETIC) ──────────────── */
